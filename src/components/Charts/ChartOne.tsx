@@ -1,12 +1,10 @@
 "use client";
 
 import { ApexOptions } from "apexcharts";
-import React from "react";
-import dynamic from "next/dynamic";
+import React, { Suspense } from "react";
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
-  ssr: false,
-});
+// Lazy load the ReactApexChart component
+const ReactApexChart = React.lazy(() => import("react-apexcharts"));
 
 const options: ApexOptions = {
   legend: {
@@ -27,7 +25,6 @@ const options: ApexOptions = {
       left: 0,
       opacity: 0.1,
     },
-
     toolbar: {
       show: false,
     },
@@ -54,10 +51,6 @@ const options: ApexOptions = {
     width: [2, 2],
     curve: "straight",
   },
-  // labels: {
-  //   show: false,
-  //   position: "top",
-  // },
   grid: {
     xaxis: {
       lines: {
@@ -81,7 +74,6 @@ const options: ApexOptions = {
     strokeOpacity: 0.9,
     strokeDashArray: 0,
     fillOpacity: 1,
-    discrete: [],
     hover: {
       size: undefined,
       sizeOffset: 5,
@@ -130,16 +122,15 @@ interface ChartOneState {
 
 const ChartOne: React.FC = () => {
   const series = [
-      {
-        name: "Product One",
-        data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
-      },
-
-      {
-        name: "Product Two",
-        data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39, 51],
-      },
-    ]
+    {
+      name: "Product One",
+      data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
+    },
+    {
+      name: "Product Two",
+      data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39, 51],
+    },
+  ];
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
@@ -181,13 +172,15 @@ const ChartOne: React.FC = () => {
 
       <div>
         <div id="chartOne" className="-ml-5">
-          <ReactApexChart
-            options={options}
-            series={series}
-            type="area"
-            height={350}
-            width={"100%"}
-          />
+          <Suspense fallback={<div>Loading...</div>}>
+            <ReactApexChart
+              options={options}
+              series={series}
+              type="area"
+              height={350}
+              width={"100%"}
+            />
+          </Suspense>
         </div>
       </div>
     </div>

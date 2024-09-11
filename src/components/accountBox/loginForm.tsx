@@ -12,16 +12,17 @@ import {
 } from "./common";
 import { ArrowLeft } from "lucide-react";
 import { Marginer } from "../marginer";
+
 import { AccountContext } from "./accountContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { auth, db } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { useUser } from "../../hooks/UserContext";
 import LottieLoader from "../LottieLoader";
-import { useRouter } from "next/navigation"; // Import from next/navigation instead of next/router
+import { useNavigate } from "react-router-dom"; // Import from next/navigation instead of next/router
 
 interface LoginFormProps {}
 
@@ -33,10 +34,10 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter(); // Initialize useRouter hook from next/navigation
+  const navigate = useNavigate(); // Initialize useRouter hook from next/navigation
 
   const HandleBack: any = async () => {
-    router.push("/");
+    navigate("/");
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,7 +98,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
 
       const jwtSecretKey =
         process.env.NEXT_PUBLIC_JWT_SECRET_KEY || "default_secret_key";
-      const token = sign(
+      const token = jwt.sign(
         {
           uid: user.uid,
           name: userData.fullName,
@@ -121,11 +122,11 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
 
       if (userData?.userRole === "admin") {
         setTimeout(() => {
-          router.push("/dashboard");
+          navigate("/dashboard");
         }, 3000);
       } else {
         setTimeout(() => {
-          router.push("/");
+          navigate("/");
         }, 3000);
       }
     } catch (error) {

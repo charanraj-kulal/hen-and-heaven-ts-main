@@ -1,18 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
+
 import { Bolt, Home, LogOut, User } from "lucide-react";
-import ClickOutside from "@/components/ClickOutside";
+import ClickOutside from "../../components/ClickOutside";
 import { useUser } from "../../hooks/UserContext";
-import { useRouter } from "next/navigation";
+import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { userData, logout } = useUser();
-  const router = useRouter();
+  const navigate = useNavigate();
   const [localUserData, setLocalUserData] = useState(userData);
 
   useEffect(() => {
@@ -36,7 +35,7 @@ const DropdownUser = () => {
     try {
       await logout();
       toast.success("Logged out successfully");
-      router.push("/login-register");
+      navigate("/login-register");
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("An error occurred during logout");
@@ -52,7 +51,7 @@ const DropdownUser = () => {
       <Link
         onClick={() => setDropdownOpen(!dropdownOpen)}
         className="flex items-center gap-4"
-        href="#"
+        to="#"
       >
         <span className="hidden text-right lg:block">
           {localUserData ? (
@@ -72,7 +71,7 @@ const DropdownUser = () => {
 
         {getProfileImage() ? (
           <span className="h-12 w-12 rounded-full">
-            <Image
+            <img
               width={112}
               height={112}
               src={getProfileImage()}
@@ -84,7 +83,7 @@ const DropdownUser = () => {
         ) : (
           <>
             <span className="h-12 w-12 rounded-full hidden dark:block">
-              <Image
+              <img
                 width={112}
                 height={112}
                 src="https://firebasestorage.googleapis.com/v0/b/hen-and-heaven.appspot.com/o/Untitled%20design%20(27).png?alt=media&token=c1711f65-7d02-4345-a98b-ccec5f95b3bf"
@@ -97,7 +96,7 @@ const DropdownUser = () => {
               />
             </span>
             <span className="h-12 w-12 rounded-full block dark:hidden">
-              <Image
+              <img
                 width={112}
                 height={112}
                 src="https://firebasestorage.googleapis.com/v0/b/hen-and-heaven.appspot.com/o/Untitled%20design%20(3).png?alt=media&token=02b1ae20-9723-4d3c-9099-65c0b8502b8d"
@@ -136,7 +135,7 @@ const DropdownUser = () => {
           <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
               <Link
-                href="/"
+                to="/"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >
                 <Home size={20} />
@@ -145,7 +144,7 @@ const DropdownUser = () => {
             </li>
             <li>
               <Link
-                href="/profile"
+                to="/profile"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >
                 <User size={20} />
@@ -155,7 +154,7 @@ const DropdownUser = () => {
 
             <li>
               <Link
-                href="/settings"
+                to="/settings"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >
                 <Bolt size={20} />

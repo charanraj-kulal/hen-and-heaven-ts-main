@@ -1,5 +1,5 @@
-import { BRAND } from "@/types/brand";
-import Image from "next/image";
+import { BRAND } from "../../types/brand";
+
 import DropdownDefault from "../Dropdowns/DropdownDefault";
 
 const brandData: BRAND[] = [
@@ -93,7 +93,7 @@ const TableFour: React.FC = () => {
             >
               <div className="flex items-center gap-3 p-2.5 xl:p-5">
                 <div className="h-9 w-full max-w-9 flex-shrink-0">
-                  <Image src={brand.logo} width={60} height={50} alt="Brand" />
+                  <img src={brand.logo} width={60} height={50} alt="Brand" />
                 </div>
                 <p className="hidden font-medium text-black dark:text-white sm:block">
                   {brand.name}

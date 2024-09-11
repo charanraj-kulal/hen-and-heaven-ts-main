@@ -20,11 +20,11 @@ import {
 } from "firebase/auth"; // Firebase Auth methods
 import LottieLoader from "../LottieLoader";
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 export const SignupForm: React.FC = () => {
   const { switchToSignin } = useContext(AccountContext);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -32,7 +32,7 @@ export const SignupForm: React.FC = () => {
     confirmPassword: "",
   });
   const HandleBack: any = async () => {
-    router.push("/");
+    navigate("/");
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
