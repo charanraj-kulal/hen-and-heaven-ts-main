@@ -1,6 +1,6 @@
 import React from "react";
 import { Facebook, Instagram, Twitter, ChevronRight } from "lucide-react";
-import Image from "next/image";
+
 const Footer = () => {
   return (
     <footer className="py-8 bg-white border-t-2 border-black-2/60 dark:border-white/60 dark:bg-black text-gray-800 dark:text-gray-200">
@@ -10,14 +10,14 @@ const Footer = () => {
             <h3 className="text-xl font-semibold mb-4">
               HEN AND <span className="text-red-600">HEAVEN</span>
             </h3>
-            <Image
+            <img
               src="/images/logo/logo-text-white.png"
               alt="Logo"
               width={800}
               height={800}
               className="h-44 w-44 aspect-square object-cover hidden dark:inline-flex justify-center md:justify-start object-left-top rounded-sm"
             />
-            <Image
+            <img
               src="/images/logo/logo-text-black.png"
               alt="Logo"
               width={800}

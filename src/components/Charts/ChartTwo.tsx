@@ -1,12 +1,10 @@
 "use client";
 
 import { ApexOptions } from "apexcharts";
-import React from "react";
-import dynamic from "next/dynamic";
+import React, { lazy, Suspense } from "react";
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
-  ssr: false,
-});
+// Lazy loading the ReactApexChart component
+const ReactApexChart = lazy(() => import("react-apexcharts"));
 
 const options: ApexOptions = {
   colors: ["#3C50E0", "#80CAEE"],
@@ -58,22 +56,14 @@ const options: ApexOptions = {
     fontFamily: "Satoshi",
     fontWeight: 500,
     fontSize: "14px",
-
     markers: {
-      radius: 99,
+      size: 5, // Set marker size instead of radius
     },
   },
   fill: {
     opacity: 1,
   },
 };
-
-interface ChartTwoState {
-  series: {
-    name: string;
-    data: number[];
-  }[];
-}
 
 const ChartTwo: React.FC = () => {
   const series = [
@@ -135,13 +125,16 @@ const ChartTwo: React.FC = () => {
 
       <div>
         <div id="chartTwo" className="-mb-9 -ml-5">
-          <ReactApexChart
-            options={options}
-            series={series}
-            type="bar"
-            height={350}
-            width={"100%"}
-          />
+          {/* Suspense with fallback for lazy loading */}
+          <Suspense fallback={<div>Loading chart...</div>}>
+            <ReactApexChart
+              options={options}
+              series={series}
+              type="bar"
+              height={350}
+              width={"100%"}
+            />
+          </Suspense>
         </div>
       </div>
     </div>

@@ -1,18 +1,18 @@
 // components/withAuth.tsx
 "use client";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/UserContext"; // assuming this hook gives you userData
 
 const withAuth = (WrappedComponent: any) => {
   return (props: any) => {
     const { userData } = useUser();
-    const router = useRouter();
+    const router = useNavigate();
 
     useEffect(() => {
       // Check if user is not an admin, redirect to login page
       if (!userData || userData.userRole !== "admin") {
-        router.push("/login-register");
+        router("/login-register");
       }
     }, [userData, router]);
 

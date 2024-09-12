@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 
 const useColorMode = () => {
-  const [colorMode, setColorMode] = useState(
+  // Default to "light" if colorMode from localStorage is null
+  const [colorMode, setColorMode] = useState<string>(
     typeof window !== "undefined" && window.localStorage.getItem("color-mode")
-      ? window.localStorage.getItem("color-mode")
+      ? (window.localStorage.getItem("color-mode") as string)
       : "light"
   );
 

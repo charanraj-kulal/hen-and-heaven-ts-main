@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import BlurIn from "@/components/magicui/blur-in";
+import BlurIn from "../components/magicui/blur-in";
 import BlurFade from "../components/magicui/blur-fade";
 import { Volume2, VolumeX } from "lucide-react";
 import { useTheme } from "next-themes";

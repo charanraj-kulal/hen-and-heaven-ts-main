@@ -1,16 +1,15 @@
 // FeaturesSectionDemo.tsx
 "use client";
 import { motion } from "framer-motion";
-import Image from "next/image";
-import { IconBrandYoutubeFilled } from "@tabler/icons-react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+
+import { Link } from "react-router-dom";
+import { cn } from "../lib/utils";
 import createGlobe from "cobe";
 import { useEffect, useRef } from "react";
 import { TypewriterEffectSmooth } from "../components/ui/typewriter-effect";
-import { Compare } from "@/components/ui/compare";
+import { Compare } from "../components/ui/compare";
 
-import DotPattern from "@/components/magicui/dot-pattern";
+import DotPattern from "../components/magicui/dot-pattern";
 const words = [
   {
     text: "About",
@@ -125,7 +124,7 @@ export const SkeletonOne = () => {
       <div className="w-full  p-5  mx-auto bg-white dark:bg-neutral-900 shadow-2xl group h-full">
         <div className="flex flex-1 w-full h-full flex-col space-y-2  ">
           {/* TODO */}
-          <Image
+          <img
             src="https://ik.imagekit.io/charanraj/UI/aantarya2%20(1).png"
             alt="header"
             width={800}
@@ -144,7 +143,7 @@ export const SkeletonOne = () => {
 export const SkeletonThree = () => {
   return (
     <Link
-      href="https://www.youtube.com/watch?v=RPa3_AD1_Vs"
+      to="https://www.youtube.com/watch?v=RPa3_AD1_Vs"
       target="__blank"
       className="relative flex gap-10  h-full group/image"
     >
@@ -162,7 +161,7 @@ export const SkeletonThree = () => {
               autoplay={true}
             />
           </div>
-          {/* <Image
+          {/*<img
             src="https://assets.aceternity.com/fireship.jpg"
             alt="header"
             width={800}
@@ -232,7 +231,7 @@ export const SkeletonTwo = () => {
             whileTap="whileTap"
             className="rounded-xl -mr-4 mt-4 p-1 bg-white dark:bg-neutral-800 dark:border-neutral-700 border border-neutral-100 flex-shrink-0 overflow-hidden"
           >
-            <Image
+            <img
               src={image}
               alt="bali images"
               width="500"
@@ -254,7 +253,7 @@ export const SkeletonTwo = () => {
             whileTap="whileTap"
             className="rounded-xl -mr-4 mt-4 p-1 bg-white dark:bg-neutral-800 dark:border-neutral-700 border border-neutral-100 flex-shrink-0 overflow-hidden"
           >
-            <Image
+            <img
               src={image}
               alt="bali images"
               width="500"
@@ -276,7 +275,7 @@ export const SkeletonTwo = () => {
             whileTap="whileTap"
             className="rounded-xl -mr-4 mt-4 p-1 bg-white dark:bg-neutral-800 dark:border-neutral-700 border border-neutral-100 flex-shrink-0 overflow-hidden"
           >
-            <Image
+            <img
               src={image}
               alt="bali images"
               width="500"
@@ -298,7 +297,7 @@ export const SkeletonTwo = () => {
             whileTap="whileTap"
             className="rounded-xl -mr-4 mt-4 p-1 bg-white dark:bg-neutral-800 dark:border-neutral-700 border border-neutral-100 flex-shrink-0 overflow-hidden"
           >
-            <Image
+            <img
               src={image}
               alt="bali images"
               width="500"

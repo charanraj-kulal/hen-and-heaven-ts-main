@@ -20,6 +20,7 @@ import { auth, db } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import jwt from "jsonwebtoken";
+import jwt_decode from "jwt-decode";
 import { useUser } from "../../hooks/UserContext";
 import LottieLoader from "../LottieLoader";
 import { useNavigate } from "react-router-dom"; // Import from next/navigation instead of next/router
@@ -80,47 +81,36 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
         return;
       }
 
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (!userDoc.exists()) {
-        toast.error("User data not found. Please contact support.");
-        return;
-      }
-
-      const userData = userDoc.data();
-
-      if (userData?.status !== "active") {
-        setIsLoading(false);
-        toast.error("Your account is not active. Please contact support.");
-        return;
-      }
-
-      const jwtSecretKey =
-        process.env.NEXT_PUBLIC_JWT_SECRET_KEY || "default_secret_key";
-      const token = jwt.sign(
-        {
-          uid: user.uid,
-          name: userData.fullName,
-          email: user.email,
-          role: userData?.userRole,
+      // Call your server-side login API
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        jwtSecretKey,
-        { expiresIn: "1h" }
-      );
+        body: JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+        }),
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Login failed");
+      }
+
+      const { token, userData } = await response.json();
+
+      // Store the token in sessionStorage
       sessionStorage.setItem("userToken", token);
 
-      updateUserData({
-        ...userData,
-        uid: user.uid,
-        email: user.email,
-      });
+      // Update user data
+      updateUserData(userData);
 
       setIsLoading(false);
       toast.success("Login successful!");
 
-      if (userData?.userRole === "admin") {
+      // Navigate based on user role
+      if (userData.userRole === "admin") {
         setTimeout(() => {
           navigate("/dashboard");
         }, 3000);
@@ -135,7 +125,6 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
       toast.error("Login failed. Please check your credentials and try again.");
     }
   };
-
   return (
     <>
       <BoxContainer>

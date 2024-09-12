@@ -6,14 +6,13 @@ import {
   HoveredLink,
   MenuItem,
   ProductItem,
-} from "@/components/ui/navbar-menu";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
+} from "../components/ui/navbar-menu";
+import { cn } from "../lib/utils";
+
 import { useTheme } from "next-themes";
 import { useUser } from "../hooks/UserContext";
-import Link from "next/link";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useRouter } from "next/navigation";
 // Update the Menu component to accept className
 const Menu = ({
   setActive,
@@ -41,11 +40,11 @@ function Navbar({ className }: { className?: string }) {
   const [active, setActive] = useState<string | null>(null);
   const { theme, setTheme } = useTheme();
   const { userData, logout } = useUser();
-  const router = useRouter();
+  const navigate = useNavigate();
   const handleLogout = () => {
     logout();
     setTimeout(() => {
-      router.push("/");
+      navigate("/");
     }, 3000);
   };
   // Additional logout logic if needed
@@ -59,24 +58,22 @@ function Navbar({ className }: { className?: string }) {
         <div>
           {/* Dark Mode Logo */}
           <a href="/" className="dark:block hidden">
-            <Image
+            <img
               src="/images/logo/logo-white.png"
               alt="Hen and Heaven Logo"
               width={70}
               height={40}
-              priority
               className="logo-class p-2"
             />
           </a>
 
           {/* Light Mode Logo */}
           <a href="/" className="dark:hidden block">
-            <Image
+            <img
               src="/images/logo/logo-black.png"
               alt="Hen and Heaven Logo"
               width={70}
               height={40}
-              priority
               className="logo-class p-2"
             />
           </a>
@@ -148,7 +145,7 @@ function Navbar({ className }: { className?: string }) {
           {userData ? (
             <div className="relative group">
               {userData.userRole === "admin" ? (
-                <Link href="/dashboard">
+                <Link to="/dashboard">
                   <button className="inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-red-900 px-4 font-medium dark:text-white text-black-2 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:ring-offset-slate-50">
                     <User className="mr-2 h-4 w-4" />
                     <span className="max-w-[100px] truncate">Dashboard</span>
@@ -181,7 +178,7 @@ function Navbar({ className }: { className?: string }) {
               </div>
             </div>
           ) : (
-            <Link href="/login-register">
+            <Link to="/login-register">
               <button className="inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-red-900 px-4 font-medium text-white transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:ring-offset-slate-50">
                 <LogIn className="mr-2 h-4 w-4" />
                 Login
