@@ -5,8 +5,6 @@ import { Bolt, Home, LogOut, User } from "lucide-react";
 import ClickOutside from "../../components/ClickOutside";
 import { useUser } from "../../hooks/UserContext";
 import { Link, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -34,11 +32,10 @@ const DropdownUser = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success("Logged out successfully");
+
       navigate("/login-register");
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("An error occurred during logout");
     }
   };
 
@@ -172,17 +169,6 @@ const DropdownUser = () => {
         </div>
       )}
 
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
       {/* <!-- Dropdown End --> */}
     </ClickOutside>
   );

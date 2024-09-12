@@ -1,13 +1,14 @@
+import { Outlet } from "react-router-dom";
 import ECommerce from "../components/Dashboard/E-commerce";
 import DefaultLayout from "../components/Layouts/DefaultLayout";
-import withAuth from "../components/withAuth";
 
 const Dashboard = () => {
   return (
     <DefaultLayout>
       <ECommerce />
+      <Outlet />
     </DefaultLayout>
   );
 };
 
-export default withAuth(Dashboard);
+export default Dashboard;

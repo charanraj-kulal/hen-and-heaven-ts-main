@@ -40,12 +40,12 @@ const menuGroups = [
           {
             icon: <CirclePlus size={18} />,
             label: "Add",
-            route: "/dashboard/inventory/add",
+            route: "/dashboard/add-inventory",
           },
           {
             icon: <Pencil size={18} />,
             label: "Manage",
-            route: "/dashboard/inventory/manage",
+            route: "/dashboard/manage-inventory",
           },
         ],
       },
@@ -57,12 +57,12 @@ const menuGroups = [
           {
             icon: <CirclePlus size={18} />,
             label: "Add",
-            route: "/dashboard/products/add",
+            route: "/dashboard/add-product",
           },
           {
             icon: <Pencil size={18} />,
             label: "Manage",
-            route: "/dashboard/products/manage",
+            route: "/dashboard/manage-inventory",
           },
         ],
       },
