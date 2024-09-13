@@ -26,7 +26,7 @@ const AddInventoryImageModal: React.FC<AddInventoryImageModalProps> = ({
     if (!selectedFile) return;
 
     setUploading(true);
-    const storageRef = ref(storage, `inventory/${selectedFile.name}`);
+    const storageRef = ref(storage, `products/${selectedFile.name}`);
 
     try {
       await uploadBytes(storageRef, selectedFile);

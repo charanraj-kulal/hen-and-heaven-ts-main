@@ -7,74 +7,69 @@ import {
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
-import {
-  PlusCircle,
-  MinusCircle,
-  Pencil,
-  Trash,
-  Save,
-  Plus,
-} from "lucide-react";
+import { Pencil, Trash, Save, Plus } from "lucide-react";
 import { db } from "../../../firebase";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import DefaultLayout from "../Layouts/DefaultLayout";
-import Breadcrumb from "../Breadcrumbs/Breadcrumb";
-import EditInventoryModal from "./EditInventoryModal";
-import AddInventoryImageModal from "./AddInventoryImageModal";
+import DefaultLayout from "../../components/Layouts/DefaultLayout";
+import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
+import EditProductModal from "./EditProductModal";
 
-interface InventoryItem {
+interface ProductItem {
   id: string;
   name: string;
-  description: string;
-  quantity: number;
-  cost: number;
-  status: "active" | "inactive";
   imageUrl: string;
+  description: string;
+  stock: number;
+  actualPrice: number;
+  discountType: "amount" | "percentage" | null;
+  discountedPrice: number | null;
+  finalPrice: number;
+  status: "active" | "inactive";
+  productType: string;
 }
 
-interface InventoryItemWithChanges extends InventoryItem {
+interface ProductItemWithChanges extends ProductItem {
   hasChanges: boolean;
-  newQuantity: number;
-  newCost: number;
+  newStock: number;
+  newFinalPrice: number;
 }
 
-const ManageInventory: React.FC = () => {
-  const [inventoryItems, setInventoryItems] = useState<
-    InventoryItemWithChanges[]
-  >([]);
-  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+const ManageProduct: React.FC = () => {
+  const [editingItem, setEditingItem] = useState<ProductItem | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAddImageModalOpen, setIsAddImageModalOpen] = useState(false);
+  const [productItems, setProductItems] = useState<ProductItemWithChanges[]>(
+    []
+  );
 
   useEffect(() => {
-    fetchInventoryItems();
+    fetchProductItems();
   }, []);
 
-  const fetchInventoryItems = async () => {
-    const q = query(collection(db, "inventory"));
+  const fetchProductItems = async () => {
+    const q = query(collection(db, "products"));
     const querySnapshot = await getDocs(q);
-    const items: InventoryItemWithChanges[] = [];
+    const items: ProductItemWithChanges[] = [];
     querySnapshot.forEach((doc) => {
-      const item = doc.data() as InventoryItem;
+      const item = doc.data() as ProductItem;
       items.push({
         ...item,
         id: doc.id,
         hasChanges: false,
-        newQuantity: item.quantity,
-        newCost: item.cost,
+        newStock: item.stock,
+        newFinalPrice: item.finalPrice,
       });
     });
-    setInventoryItems(items);
+    setProductItems(items);
   };
 
-  const handleQuantityChange = (id: string, change: number) => {
-    setInventoryItems((items) =>
+  const handleStockChange = (id: string, newQuantity: number) => {
+    setProductItems((items) =>
       items.map((item) =>
         item.id === id
           ? {
               ...item,
-              newQuantity: Math.max(0, item.newQuantity + change),
+              newStock: newQuantity,
               hasChanges: true,
             }
           : item
@@ -82,152 +77,145 @@ const ManageInventory: React.FC = () => {
     );
   };
 
-  const handlePriceChange = (id: string, newPrice: number) => {
-    setInventoryItems((items) =>
+  const handleStatusToggle = (id: string) => {
+    setProductItems((items) =>
       items.map((item) =>
-        item.id === id ? { ...item, newCost: newPrice, hasChanges: true } : item
+        item.id === id
+          ? {
+              ...item,
+              status: item.status === "active" ? "inactive" : "active",
+              hasChanges: true,
+            }
+          : item
       )
     );
   };
 
-  const handleSave = async (item: InventoryItemWithChanges) => {
-    await updateDoc(doc(db, "inventory", item.id), {
-      quantity: item.newQuantity,
-      cost: item.newCost,
+  const handleSave = async (item: ProductItemWithChanges) => {
+    await updateDoc(doc(db, "products", item.id), {
+      stock: item.newStock,
+      status: item.status,
+      finalPrice: item.newFinalPrice,
     });
-    await fetchInventoryItems();
-    toast.success("Item updated successfully");
+    await fetchProductItems();
+    toast.success("Product updated successfully");
   };
-
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this item?")) {
-      await deleteDoc(doc(db, "inventory", id));
-      await fetchInventoryItems();
-      toast.success("Item deleted successfully");
-    }
-  };
-
-  const handleEdit = (item: InventoryItem) => {
+  const handleEdit = (item: ProductItem) => {
     setEditingItem(item);
     setIsEditModalOpen(true);
   };
-
-  const handleUpdate = async (updatedItem: InventoryItem) => {
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      await deleteDoc(doc(db, "products", id));
+      await fetchProductItems();
+      toast.success("Product deleted successfully");
+    }
+  };
+  const handleUpdate = async (updatedItem: ProductItem) => {
     const itemData = {
       name: updatedItem.name,
       description: updatedItem.description,
-      quantity: updatedItem.quantity,
-      cost: updatedItem.cost,
+      actualPrice: updatedItem.actualPrice,
+      discountType: updatedItem.discountType,
+      discountedPrice: updatedItem.discountedPrice,
+      stock: updatedItem.stock,
       status: updatedItem.status,
+      finalPrice: updatedItem.finalPrice,
       imageUrl: updatedItem.imageUrl,
     };
 
-    await updateDoc(doc(db, "inventory", updatedItem.id), itemData);
-    await fetchInventoryItems();
+    await updateDoc(doc(db, "products", updatedItem.id), itemData);
+    await fetchProductItems();
     setIsEditModalOpen(false);
     toast.success("Item updated successfully");
   };
-
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Manage Inventory" />
-      <div className="rounded-sm border  border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <Breadcrumb pageName="Manage Products" />
+      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="p-4 md:p-6 xl:p-7.5">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Inventory Items</h2>
-            <button
-              onClick={() => setIsAddImageModalOpen(true)}
-              className="btn btn-primary border border-black dark:border-white/30 hover:bg-black hover:text-white transition-all p-2 rounded-md flex items-center gap-1"
-            >
-              <Plus size={15} />
-              Inventory Images
-            </button>
-          </div>
+          <h2 className="text-xl font-semibold mb-4">Product List</h2>
           <div className="overflow-x-auto">
-            <table className="w-full table-auto justify-center items-center">
-              <thead className="justify-center items-center">
-                <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                  <th className="px-4 py-2">Name</th>
-                  <th className="px-4 py-2">Quantity</th>
-                  <th className="px-4 py-2">Price</th>
+            <table className="w-full table-auto">
+              <thead className="bg-gray-2 text-left dark:bg-meta-4">
+                <tr>
+                  <th className="px-4 py-2">Product</th>
+                  <th className="px-4 py-2">Stock</th>
+                  <th className="px-4 py-2">Actual Price</th>
+                  <th className="px-4 py-2">Discount Type</th>
+                  <th className="px-4 py-2">Disc Amt/Percent</th>
+                  <th className="px-4 py-2">Final Price</th>
                   <th className="px-4 py-2">Status</th>
-                  <th className="px-4 py-2">Actions</th>
+                  <th className="px-4 py-2">Action</th>
                 </tr>
               </thead>
-              <tbody className="justify-center items-center">
-                {inventoryItems.map((item) => (
+              <tbody>
+                {productItems.map((item) => (
                   <tr key={item.id}>
-                    <td className="flex border-b border-[#eee] px-4 py-3 justify-start dark:border-strokedark xl:pl-11">
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                        <div className="h-12.5 w-15 rounded-md">
-                          <img
-                            src={item.imageUrl}
-                            alt={item.name}
-                            className="w-16 h-16 object-cover rounded-md"
-                          />
-                        </div>
-                        <p className="text-sm text-black dark:text-white">
-                          {item.name}
-                        </p>
-                      </div>
+                    <td className="flex items-center px-4 py-2 max-w-50 border-b">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-12 h-12 object-cover rounded-md mr-4"
+                      />
+                      <span>{item.name}</span>
                     </td>
-                    <td className="px-4 py-2">
-                      <button onClick={() => handleQuantityChange(item.id, -1)}>
-                        <MinusCircle size={14} />
-                      </button>
-                      <span className="mx-2">{item.newQuantity}</span>
-                      <button onClick={() => handleQuantityChange(item.id, 1)}>
-                        <PlusCircle size={14} />
-                      </button>
-                    </td>
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-2 border-b">
                       <input
                         type="number"
-                        value={item.newCost}
+                        min="0"
+                        step="1"
+                        value={item.newStock}
                         onChange={(e) =>
-                          handlePriceChange(item.id, Number(e.target.value))
+                          handleStockChange(item.id, Number(e.target.value))
                         }
                         className="w-24 px-2 py-1 border rounded bg-black-2/20 text-black-2 dark:text-white"
                       />
                     </td>
-                    <td className="px-4 py-2">
-                      <p
-                        className={`inline-flex rounded-full bg-opacity-10 items-center px-3 py-1 text-sm font-medium ${
+                    <td className="px-4 py-2 border-b">{item.actualPrice}</td>
+                    <td className="px-4 py-2 border-b">
+                      {item.discountType ? item.discountType : "-"}
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      {item.discountedPrice ? item.discountedPrice : "-"}
+                    </td>
+                    <td className="px-4 py-2 border-b">{item.newFinalPrice}</td>
+                    <td className="px-4 py-2 border-b">
+                      <button
+                        className={`px-3 py-1 rounded-full text-sm ${
                           item.status === "active"
-                            ? "bg-success text-success"
-                            : item.status === "inactive"
-                            ? "bg-danger text-danger"
-                            : "bg-warning text-warning"
+                            ? "bg-green-500 text-white"
+                            : "bg-red-500 text-white"
                         }`}
+                        onClick={() => handleStatusToggle(item.id)}
                       >
                         {item.status}
-                      </p>
+                      </button>
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-4 py-2 border-b">
                       <button
                         onClick={() => handleEdit(item)}
-                        className="btn btn-primary mr-3"
+                        className="text-blue-500 mr-1"
                       >
                         <Pencil size={18} />
                       </button>
+
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="btn btn-danger mr-3"
+                        className="text-red-500 mr-1"
                       >
                         <Trash size={18} />
                       </button>
                       <button
                         onClick={() => handleSave(item)}
                         disabled={!item.hasChanges}
+                        className={`mr-3 ${
+                          item.hasChanges
+                            ? "text-black-2 dark:text-white"
+                            : "text-gray-500"
+                        }`}
                       >
-                        <Save
-                          size={18}
-                          className={` ${
-                            item.hasChanges
-                              ? "dark:text-white text-black-2"
-                              : "text-gray-500"
-                          }`}
-                        />
+                        <Save size={18} />
                       </button>
                     </td>
                   </tr>
@@ -238,31 +226,24 @@ const ManageInventory: React.FC = () => {
         </div>
       </div>
       {editingItem && (
-        <EditInventoryModal
+        <EditProductModal
           item={editingItem}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           onUpdate={handleUpdate}
         />
       )}
-      <AddInventoryImageModal
-        isOpen={isAddImageModalOpen}
-        onClose={() => setIsAddImageModalOpen(false)}
-        onImagesAdded={fetchInventoryItems}
-      />
       <ToastContainer
         position="top-center"
         autoClose={5000}
         hideProgressBar={false}
-        newestOnTop={false}
         closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
         pauseOnHover
+        draggable
+        pauseOnFocusLoss
       />
     </DefaultLayout>
   );
 };
 
-export default ManageInventory;
+export default ManageProduct;

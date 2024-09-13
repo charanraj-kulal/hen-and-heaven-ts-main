@@ -40,7 +40,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login-register" element={<LoginRegister />} />
             <Route path="/dashboard" element={<ProtectedDashboard />} />
-            <Route index element={<div>Welcome to Dashboard</div>} />
+            <Route index element={<Home />} />
             <Route
               path="/dashboard/add-inventory"
               element={<ProtectedAddInventory />}

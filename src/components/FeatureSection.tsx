@@ -63,7 +63,7 @@ export function FeaturesSection() {
         <div className="inline-flex justify-center">
           <TypewriterEffectSmooth words={words} />
         </div>
-        <p className="text-sm md:text-lg  max-w-2xl font-semibold my-4 mx-auto text-black text-center  dark:text-white">
+        <p className="text-sm md:text-lg  max-w-2xl font-semibold my-4 mx-auto text-black-2 text-center  dark:text-white">
           At Hen and <span className="text-red-500">Heaven</span>, we are
           committed to revolutionizing poultry farm management by providing an
           innovative and comprehensive Poultry Farm Management System. Our goal
@@ -104,7 +104,7 @@ const FeatureCard = ({
 
 const FeatureTitle = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <p className="max-w-5xl mx-auto text-left tracking-tight text-black dark:text-white text-xl md:text-2xl md:leading-snug">
+    <p className="max-w-5xl mx-auto text-left tracking-tight text-black-2 dark:text-white text-xl md:text-2xl md:leading-snug">
       {children}
     </p>
   );
@@ -134,8 +134,8 @@ export const SkeletonOne = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-0 z-40 inset-x-0 h-60 bg-gradient-to-t from-white dark:from-black via-white dark:via-black to-transparent w-full pointer-events-none" />
-      <div className="absolute top-0 z-40 inset-x-0 h-60 bg-gradient-to-b from-white dark:from-black via-transparent to-transparent w-full pointer-events-none" />
+      <div className="absolute bottom-0 z-40 inset-x-0 h-60 bg-gradient-to-t from-white dark:from-black-2 via-white dark:via-black-2 to-transparent w-full pointer-events-none" />
+      <div className="absolute top-0 z-40 inset-x-0 h-60 bg-gradient-to-b from-white dark:from-black-2 via-transparent to-transparent w-full pointer-events-none" />
     </div>
   );
 };
@@ -308,8 +308,8 @@ export const SkeletonTwo = () => {
         ))}
       </div>
 
-      <div className="absolute left-0 z-[100] inset-y-0 w-20 bg-gradient-to-r from-white dark:from-black to-transparent  h-full pointer-events-none" />
-      <div className="absolute right-0 z-[100] inset-y-0 w-20 bg-gradient-to-l from-white dark:from-black  to-transparent h-full pointer-events-none" />
+      <div className="absolute left-0 z-[100] inset-y-0 w-20 bg-gradient-to-r from-white dark:from-black-2 to-transparent  h-full pointer-events-none" />
+      <div className="absolute right-0 z-[100] inset-y-0 w-20 bg-gradient-to-l from-white dark:from-black-2  to-transparent h-full pointer-events-none" />
     </div>
   );
 };

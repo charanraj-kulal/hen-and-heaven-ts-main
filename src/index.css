@@ -13,11 +13,12 @@
   background: var(--background);
 }
 *::-webkit-scrollbar-thumb {
-  background: #df1c1f;
+  background: #e81f23;
   border-radius: 25px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: rgb(19, 19, 160);
+  background: #1c2434;
+  transition: 0.5s all;
 }
 body {
   background-color: black;

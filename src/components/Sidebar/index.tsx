@@ -62,7 +62,7 @@ const menuGroups = [
           {
             icon: <Pencil size={18} />,
             label: "Manage",
-            route: "/dashboard/manage-inventory",
+            route: "/dashboard/manage-product",
           },
         ],
       },
