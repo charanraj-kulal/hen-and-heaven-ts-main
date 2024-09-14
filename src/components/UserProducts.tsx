@@ -14,6 +14,7 @@ import { useUser } from "../hooks/UserContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProductModal from "../components/ProductModal";
+import { List, ShoppingCart } from "lucide-react";
 
 interface ProductItem {
   id: string;
@@ -165,16 +166,26 @@ const ProductBuyingPage: React.FC = () => {
               </div>
               <div className="flex space-x-2">
                 <button
-                  onClick={() => addToCart(product)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  onClick={() => openModal(product)}
+                  className="inline-flex h-10 items-center justify-center rounded-md
+                  bg-gradient-to-r from-blue-500 to-blue-900 px-4 font-medium
+                  text-white transition-colors focus:outline-none focus:ring-2
+                  focus:ring-slate-900 focus:ring-offset-2
+                  focus:ring-offset-slate-50"
                 >
-                  Add to Cart
+                  <List size={20} className="mr-1" />
+                  View Details
                 </button>
                 <button
-                  onClick={() => openModal(product)}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
+                  onClick={() => addToCart(product)}
+                  className="inline-flex h-10 items-center justify-center rounded-md
+                  bg-gradient-to-r from-red-500 to-red-900 px-4 font-medium
+                  text-white transition-colors focus:outline-none focus:ring-2
+                  focus:ring-slate-900 focus:ring-offset-2
+                  focus:ring-offset-slate-50"
                 >
-                  View Details
+                  <ShoppingCart size={20} className="mr-1" />
+                  Add to Cart
                 </button>
               </div>
             </MagicCard>

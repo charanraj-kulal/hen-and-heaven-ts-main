@@ -2,6 +2,7 @@ import express from "express";
 import admin from "firebase-admin";
 import jwt from "jsonwebtoken";
 import cors from "cors";
+import Razorpay from "razorpay";
 // Import the service account key
 import serviceAccount from "./serviceAccountKey.js";
 
@@ -16,17 +17,18 @@ const db = admin.firestore();
 const app = express();
 
 // Enable CORS for all routes
-app.use(cors({
-  origin: 'http://localhost:5173', // Replace with your client's URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Replace with your client's URL
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json()); // Parse incoming requests with JSON payloads
 
 // JWT secret key (store this securely, preferably in an environment variable)
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
-
 
 // Login endpoint
 app.post("/api/login", async (req, res) => {
@@ -85,6 +87,28 @@ app.post("/api/login", async (req, res) => {
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/create-razorpay-order", async (req, res) => {
+  try {
+    const instance = new Razorpay({
+      key_id: "rzp_test_X45n8vinhpSHdY",
+      key_secret: "WRVfG5almOptKtaBpCykFJxY",
+    });
+
+    const options = {
+      amount: req.body.amount * 100,
+      currency: "INR",
+      receipt: "receipt_" + Math.random().toString(36).substring(7),
+      description: req.body.description,
+    };
+
+    const order = await instance.orders.create(options);
+    res.json(order);
+  } catch (error) {
+    console.error("Error creating Razorpay order:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 

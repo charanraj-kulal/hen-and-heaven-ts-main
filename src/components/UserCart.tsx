@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { collection, doc, setDoc, getDoc, addDoc } from "firebase/firestore";
-import { db } from "../../firebase"; // adjust path to your firebase setup
+import { db } from "../../firebase";
 import { useUser } from "../hooks/UserContext";
 import { toast } from "react-toastify";
 import {
   PlusCircle,
   MinusCircle,
   Trash2,
-  ShoppingCart,
-  ArrowRight,
   IterationCcw,
+  WalletCards,
 } from "lucide-react";
 import Skeleton from "../components/Skeleton/Skeleton";
 import { Link } from "react-router-dom";
+
 interface ProductItem {
   id: string;
   name: string;
@@ -42,6 +42,12 @@ interface OrderDetails {
   totalAmount: number;
 }
 
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 const UserCart: React.FC = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const { userData } = useUser();
@@ -65,6 +71,16 @@ const UserCart: React.FC = () => {
   useEffect(() => {
     calculateOrderDetails();
   }, [cart]);
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const fetchCart = async () => {
     if (!userData) return;
@@ -139,19 +155,78 @@ const UserCart: React.FC = () => {
       toast.error("Please login to checkout.");
       return;
     }
-
+    console.log(orderDetails.totalAmount);
     try {
-      // Add order to the orders collection
-      await addDoc(collection(db, "orders"), orderDetails);
+      const response = await fetch(
+        "http://localhost:5000/api/create-razorpay-order",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: orderDetails.totalAmount, // Convert to paise
+          }),
+        }
+      );
+      const orderData = await response.json();
+      console.log(orderData);
+      if (!window.Razorpay) {
+        toast.error("Razorpay SDK not loaded. Please try again later.");
+        return;
+      }
 
-      // Clear the user's cart
-      await setDoc(doc(db, "userCart", userData.uid), { items: [] });
+      const options = {
+        key: "rzp_test_X45n8vinhpSHdY", // Replace with your actual Razorpay test key
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Hen and Heaven",
+        image:
+          "https://ik.imagekit.io/charanraj/Poultry/Products%20Poultry-Hen%20and%20heaven/razorpay%20logo%20(1).png",
+        description: "Cart Checkout",
+        order_id: orderData.id,
+        handler: async function (response: any) {
+          console.log("Razorpay response:", response);
 
-      setCart([]);
-      toast.success("Order placed successfully!");
+          const completeOrderDetails = {
+            ...orderDetails,
+            paymentId: response.razorpay_payment_id || null,
+            orderId: orderData.id,
+            signature: response.razorpay_signature || null,
+            createdAt: new Date(),
+          };
+
+          try {
+            await addDoc(collection(db, "orders"), completeOrderDetails);
+            await setDoc(doc(db, "userCart", userData.uid), { items: [] });
+            setCart([]);
+            toast.success("Order placed successfully!");
+          } catch (error) {
+            console.error("Error storing order:", error);
+            toast.error(
+              "Failed to store order details. Please contact support."
+            );
+          }
+        },
+        prefill: {
+          name: userData.displayName,
+          email: userData.email,
+        },
+        theme: {
+          color: "#121212",
+        },
+        modal: {
+          ondismiss: function () {
+            console.log("Checkout form closed");
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (error) {
-      console.error("Error placing order:", error);
-      toast.error("Failed to place order. Please try again.");
+      console.error("Error processing payment:", error);
+      toast.error(
+        "An error occurred while processing your payment. Please try again."
+      );
     }
   };
 
@@ -267,9 +342,14 @@ const UserCart: React.FC = () => {
                 </div>
                 <button
                   onClick={handleCheckout}
-                  className="mt-6 w-full px-6 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
+                  className="inline-flex mt-6 w-full h-10 items-center justify-center rounded-md
+                  bg-gradient-to-r from-blue-500 to-blue-900 px-4 font-medium
+                  text-white transition-colors focus:outline-none focus:ring-2
+                  focus:ring-slate-900 focus:ring-offset-2
+                  focus:ring-offset-slate-50"
                 >
-                  Checkout
+                  <WalletCards size={20} className="mr-1" />
+                  Proceed to Payment
                 </button>
               </div>
             </div>
