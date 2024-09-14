@@ -1,24 +1,17 @@
 import React, { useState, useEffect } from "react";
 import {
-  collection,
   doc,
-  setDoc,
   getDoc,
   runTransaction,
   updateDoc,
+  setDoc,
+  collection,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useUser } from "../hooks/UserContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  PlusCircle,
-  MinusCircle,
-  Trash2,
-  IterationCcw,
-  WalletCards,
-  LogIn,
-} from "lucide-react";
+import { LogIn, IterationCcw } from "lucide-react";
 import Skeleton from "../components/Skeleton/Skeleton";
 import { Link } from "react-router-dom";
 import AddressFormDialog from "./AddressFormDialog";
@@ -30,6 +23,8 @@ import {
   DialogTitle,
 } from "../components/ui/dialog";
 import { Button } from "../components/button";
+import CartItems from "./CartItems";
+import OrderSummary from "./OrderSummary";
 
 interface ProductItem {
   id: string;
@@ -78,7 +73,6 @@ const UserCart: React.FC = () => {
   const [showAddressDialog, setShowAddressDialog] = useState(false);
   const [showAddressChangePrompt, setShowAddressChangePrompt] = useState(false);
   const [userAddress, setUserAddress] = useState<Address | null>(null);
-
   const [orderDetails, setOrderDetails] = useState<OrderDetails>({
     buyerId: "",
     products: [],
@@ -98,6 +92,7 @@ const UserCart: React.FC = () => {
       toast.error("Please login to view your cart.");
     }
   }, [userData]);
+
   useEffect(() => {
     calculateOrderDetails();
   }, [cart]);
@@ -151,7 +146,6 @@ const UserCart: React.FC = () => {
       const cartDoc = await getDoc(doc(db, "userCart", userData.uid));
       if (cartDoc.exists()) {
         const cartItems = cartDoc.data().items || [];
-        // Fetch latest stock information for each item
         const updatedCartItems = await Promise.all(
           cartItems.map(async (item: CartItem) => {
             const productDoc = await getDoc(doc(db, "products", item.id));
@@ -166,7 +160,7 @@ const UserCart: React.FC = () => {
             return item;
           })
         );
-        setCart(updatedCartItems);
+        setCart(updatedCartItems.filter((item) => item.status === "active"));
       }
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -175,7 +169,6 @@ const UserCart: React.FC = () => {
       setIsLoading(false);
     }
   };
-
   const updateCart = async (updatedCart: CartItem[]) => {
     if (!userData) {
       toast.error("Please login to update cart.");
@@ -300,6 +293,7 @@ const UserCart: React.FC = () => {
         order_id: orderData.id,
         handler: async function (response: any) {
           console.log("Razorpay response:", response);
+          await refreshProducts();
 
           try {
             await runTransaction(db, async (transaction) => {
@@ -348,6 +342,7 @@ const UserCart: React.FC = () => {
             });
 
             setCart([]);
+
             toast.success("Order placed successfully!");
           } catch (error) {
             console.error("Error processing order:", error);
@@ -375,6 +370,28 @@ const UserCart: React.FC = () => {
       toast.error(
         "An error occurred while processing your payment. Please try again."
       );
+    }
+  };
+  const refreshProducts = async () => {
+    try {
+      const updatedCart = await Promise.all(
+        cart.map(async (item) => {
+          const productDoc = await getDoc(doc(db, "products", item.id));
+          if (productDoc.exists()) {
+            const productData = productDoc.data();
+            return {
+              ...item,
+              stock: productData.stock,
+              status: productData.status,
+            };
+          }
+          return item;
+        })
+      );
+      setCart(updatedCart.filter((item) => item.status === "active"));
+    } catch (error) {
+      console.error("Error refreshing products:", error);
+      toast.error("Failed to refresh product information.");
     }
   };
 
@@ -444,7 +461,7 @@ const UserCart: React.FC = () => {
             </div>
             <Link
               to="/products"
-              className=" mt-4 inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-red-900 px-4 py-2 font-medium text-white transition-colors"
+              className="mt-4 inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-red-900 px-4 py-2 font-medium text-white transition-colors"
             >
               <IterationCcw size={20} className="mr-1 mt-0.5" />
               Products
@@ -452,77 +469,15 @@ const UserCart: React.FC = () => {
           </div>
         ) : (
           <div className="flex flex-col md:flex-row gap-8">
-            <div className="w-full md:w-2/3">
-              {cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex flex-col sm:flex-row items-center justify-between border-b py-4"
-                >
-                  <div className="flex items-center mb-4 sm:mb-0">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover mr-4"
-                    />
-                    <div>
-                      <h3 className="font-semibold">{item.name}</h3>
-                      <p>₹{item.finalPrice}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      disabled={item.quantity === 1}
-                      className="p-1 mr-1 disabled:opacity-50"
-                    >
-                      <MinusCircle size={18} />
-                    </button>
-                    <span className="mx-2">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      disabled={item.quantity === item.stock}
-                      className="p-1 ml-1 disabled:opacity-50"
-                    >
-                      <PlusCircle size={18} />
-                    </button>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="ml-4 text-red-500"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="w-full md:w-1/3">
-              <div className="bg-card text-card-foreground rounded-lg p-6 shadow-sm">
-                <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
-                <div className="space-y-2">
-                  <p>Total Products: {orderDetails.totalProducts}</p>
-                  <p>Product Price: ₹{orderDetails.productPrice.toFixed(2)}</p>
-                  <p>GST (18%): ₹{orderDetails.gst.toFixed(2)}</p>
-                  <p>
-                    Convenience Fee (2%): ₹
-                    {orderDetails.convenienceFee.toFixed(2)}
-                  </p>
-                  <p className="font-bold text-lg">
-                    Total Amount: ₹{orderDetails.totalAmount.toFixed(2)}
-                  </p>
-                </div>
-                <button
-                  onClick={handleCheckout}
-                  className="inline-flex mt-6 w-full h-10 items-center justify-center rounded-md
-                  bg-gradient-to-r from-blue-500 to-blue-900 px-4 font-medium
-                  text-white transition-colors focus:outline-none focus:ring-2
-                  focus:ring-slate-900 focus:ring-offset-2
-                  focus:ring-offset-slate-50"
-                >
-                  <WalletCards size={18} className="mr-1" />
-                  Proceed to Payment
-                </button>
-              </div>
-            </div>
+            <CartItems
+              cart={cart}
+              updateQuantity={updateQuantity}
+              removeFromCart={removeFromCart}
+            />
+            <OrderSummary
+              orderDetails={orderDetails}
+              handleCheckout={handleCheckout}
+            />
           </div>
         )}
         <AddressFormDialog
