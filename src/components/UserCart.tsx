@@ -331,6 +331,9 @@ const UserCart: React.FC = () => {
                 paymentId: response.razorpay_payment_id || null,
                 orderId: orderData.id,
                 signature: response.razorpay_signature || null,
+                status: "placed",
+                buyerName: userData.fullName,
+                shippingAddress: userAddress,
                 createdAt: new Date(),
               };
               const orderRef = doc(collection(db, "orders"));

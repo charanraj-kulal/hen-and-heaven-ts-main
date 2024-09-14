@@ -151,6 +151,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
           // Create order object
           const orderDetails = {
             buyerId: userData.uid,
+            buyerName: userData.fullName,
             products: [{ ...product, quantity: 1 }],
             totalProducts: 1,
             productPrice: product.finalPrice,
@@ -160,6 +161,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
             paymentId: response.razorpay_payment_id || null,
             orderId: orderData.id, // Use the order ID from the server response
             signature: response.razorpay_signature || null,
+            status: "placed",
+            shippingAddress: userAddress,
             createdAt: new Date(),
           };
 

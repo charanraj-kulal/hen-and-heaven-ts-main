@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import AddInventoryPage from "./pages/Inventory/AddInventory";
 import ManageInventoryPage from "./pages/Inventory/ManageInventory";
 import AddProductPage from "./pages/Product/AddProduct";
+import OrdersPage from "./pages/Orders/OrdersPage";
 import ManageProductPage from "./pages/Product/ManageProduct";
 import ProductBuyingPage from "./pages/Products";
 import UserCartpage from "./pages/userCartPage";
@@ -25,6 +26,7 @@ const ProtectedDashboard = withAuth(Dashboard);
 const ProtectedAddInventory = withAuth(AddInventoryPage);
 const ProtectedManageInventory = withAuth(ManageInventoryPage);
 const ProtectedAddProduct = withAuth(AddProductPage);
+const ProtectedOrderPage = withAuth(OrdersPage);
 const ProtectedManageProduct = withAuth(ManageProductPage);
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -61,6 +63,7 @@ const App: React.FC = () => {
               path="/dashboard/manage-product"
               element={<ProtectedManageProduct />}
             />
+            <Route path="/dashboard/orders" element={<ProtectedOrderPage />} />
           </Routes>
         </Router>
       </UserProvider>
