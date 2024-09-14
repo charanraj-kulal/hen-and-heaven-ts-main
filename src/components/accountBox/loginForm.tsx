@@ -16,11 +16,9 @@ import { Marginer } from "../marginer";
 import { AccountContext } from "./accountContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { auth, db } from "../../../firebase";
+import { auth } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import jwt from "jsonwebtoken";
-import jwt_decode from "jwt-decode";
+
 import { useUser } from "../../hooks/UserContext";
 import LottieLoader from "../LottieLoader";
 import { useNavigate } from "react-router-dom"; // Import from next/navigation instead of next/router

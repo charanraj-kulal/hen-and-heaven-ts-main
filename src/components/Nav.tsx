@@ -1,6 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import { LogIn, User, LogOut, LayoutDashboard } from "lucide-react";
+import {
+  LogIn,
+  User,
+  LogOut,
+  LayoutDashboard,
+  ShoppingCartIcon,
+} from "lucide-react";
 import { Sun, Moon } from "lucide-react";
 import {
   HoveredLink,
@@ -131,6 +137,9 @@ function Navbar({ className }: { className?: string }) {
         </Menu>
 
         <div className="flex items-center space-x-4">
+          <Link to="/cart">
+            <ShoppingCartIcon className="h-6 w-6" size={20} />
+          </Link>
           <button
             type="button"
             className="p-2 text-black dark:text-white"
