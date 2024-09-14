@@ -5,6 +5,8 @@ import AddInventoryPage from "./pages/Inventory/AddInventory";
 import ManageInventoryPage from "./pages/Inventory/ManageInventory";
 import AddProductPage from "./pages/Product/AddProduct";
 import ManageProductPage from "./pages/Product/ManageProduct";
+import ProductBuyingPage from "./pages/Products";
+import UserCartpage from "./pages/userCartPage";
 import LoginRegister from "./pages/LoginRegisterForm";
 import Dashboard from "./pages/Dashboard";
 import { UserProvider } from "../src/hooks/UserContext";
@@ -39,6 +41,8 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login-register" element={<LoginRegister />} />
+            <Route path="/products" element={<ProductBuyingPage />} />
+            <Route path="/cart" element={<UserCartpage />} />
             <Route path="/dashboard" element={<ProtectedDashboard />} />
             <Route index element={<Home />} />
             <Route

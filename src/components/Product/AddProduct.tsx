@@ -20,13 +20,55 @@ const ProductAddForm: React.FC = () => {
     discountType: "",
     finalPrice: "",
     productType: "",
+    subType: "",
   });
+  const [availableImages, setAvailableImages] = useState<string[]>([]);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [availableImages, setAvailableImages] = useState<string[]>([]);
   const [discounted, setDiscounted] = useState(false);
   const { userData } = useUser();
   const navigate = useNavigate();
+
+  const subTypeOptions: { [key: string]: string[] } = {
+    eggs: [
+      "Standard White Eggs",
+      "Standard Brown Eggs",
+      "Furnished / Enriched / Nest-Laid Eggs",
+      "Vitamin-Enhanced Eggs",
+      "Vegetarian Eggs",
+      "Processed Eggs",
+    ],
+    chickens: [
+      "Boiler Chicken",
+      "Tyson Chicken",
+      "Delaware Chicken",
+      "Jersey Giant Chicken",
+      "Desi Chicken",
+      "Breast Pieces",
+      "Tenderloins Pieces",
+      "Thighs",
+      "Drumsticks",
+      "Wings",
+      "Neck",
+      "Back",
+    ],
+    "hens-and-chicks": [
+      "Boiler Chicken",
+      "Tyson Chicken",
+      "Delaware Chicken",
+      "Jersey Giant Chicken",
+      "Desi Chicken",
+      "Colored Chicks",
+    ],
+    "bulk-eggs-chickens-feeds": [
+      "30-300 Crate Eggs",
+      "30-500kg Chicken Meats",
+      "30-1000 Chicks",
+      "30-500 Chickens",
+      "30-200 Feed Bags",
+      "30kg-100kg Feed Bags",
+    ],
+  };
 
   useEffect(() => {
     if (formData.productType) fetchAvailableImages();
@@ -63,12 +105,6 @@ const ProductAddForm: React.FC = () => {
     >
   ) => {
     const { name, value } = e.target;
-
-    // Prevent negative values for price and stock
-    if ((name === "actualPrice" || name === "stock") && parseFloat(value) < 0) {
-      return;
-    }
-
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === "actualPrice" || name === "discountedPrice") {
@@ -85,7 +121,7 @@ const ProductAddForm: React.FC = () => {
       .replace(/_/g, " ")
       .replace(/%2F/g, " ")
       .split(" ")
-      .slice(1) // Remove the first word (category)
+      .slice(1)
       .join(" ")
       .replace(/\b\w/g, (l) => l.toUpperCase());
 
@@ -126,7 +162,6 @@ const ProductAddForm: React.FC = () => {
       });
 
       toast.success("Product added successfully!");
-      // Reset form
       setFormData({
         name: "",
         description: "",
@@ -137,6 +172,7 @@ const ProductAddForm: React.FC = () => {
         discountType: "",
         finalPrice: "",
         productType: "",
+        subType: "",
       });
       setSelectedImageUrl(null);
     } catch (error) {
@@ -225,6 +261,41 @@ const ProductAddForm: React.FC = () => {
                 ))}
               </div>
             </div>
+            {/* Sub-Type Dropdown */}
+            {formData.productType && (
+              <div className="mb-4">
+                <label
+                  htmlFor="subType"
+                  className="mb-2 block text-sm font-medium text-black dark:text-white"
+                >
+                  Product Sub-Type
+                </label>
+                <select
+                  id="subType"
+                  name="subType"
+                  value={formData.subType}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition text-black dark:text-white"
+                >
+                  <option
+                    value=""
+                    className=" text-black dark:text-white dark:bg-black bg-white"
+                  >
+                    Select Sub-Type
+                  </option>
+                  {subTypeOptions[formData.productType]?.map((subType) => (
+                    <option
+                      className=" text-black dark:text-white dark:bg-black bg-white"
+                      key={subType}
+                      value={subType}
+                    >
+                      {subType}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Name Auto-fill from Image */}
             <div className="mb-4">
@@ -321,7 +392,7 @@ const ProductAddForm: React.FC = () => {
                   htmlFor="actualPrice"
                   className="mb-2 block text-sm font-medium text-black dark:text-white"
                 >
-                  Actual Price
+                  Actual Price(per unit)
                 </label>
                 <input
                   type="number"

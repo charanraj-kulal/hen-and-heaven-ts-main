@@ -27,6 +27,7 @@ interface ProductItem {
   finalPrice: number;
   status: "active" | "inactive";
   productType: string;
+  productSubType: string;
 }
 
 interface ProductItemWithChanges extends ProductItem {
@@ -120,7 +121,9 @@ const ManageProduct: React.FC = () => {
       discountedPrice: updatedItem.discountedPrice,
       stock: updatedItem.stock,
       status: updatedItem.status,
-      finalPrice: updatedItem.finalPrice,
+      finalPrice: parseFloat(updatedItem.finalPrice.toFixed(2)),
+      productType: updatedItem.productType,
+      productSubType: updatedItem.productSubType,
       imageUrl: updatedItem.imageUrl,
     };
 

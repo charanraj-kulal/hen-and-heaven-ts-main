@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { LogIn, User, LogOut } from "lucide-react";
+import { LogIn, User, LogOut, LayoutDashboard } from "lucide-react";
 import { Sun, Moon } from "lucide-react";
 import {
   HoveredLink,
@@ -96,27 +96,27 @@ function Navbar({ className }: { className?: string }) {
             <div className="text-sm grid grid-cols-2 gap-10 p-4">
               <ProductItem
                 title="Eggs"
-                href="/products/eggs"
+                href="/products"
                 src="https://ik.imagekit.io/charanraj/Poultry/Products%20Poultry-Hen%20and%20heaven/brown-eggs.png"
                 description="Fresh eggs from our farm"
               />
               <ProductItem
                 title="Chicken"
-                href="/products/chicken"
+                href="/products"
                 src="https://ik.imagekit.io/charanraj/Poultry/Products%20Poultry-Hen%20and%20heaven/full-chicken-flesh.png"
                 description="Fresh chicken from our farm"
               />
               <ProductItem
-                title="Moonbeam"
-                href="https://gomoonbeam.com"
-                src="https://assets.aceternity.com/demos/Screenshot+2024-02-21+at+11.51.31%E2%80%AFPM.png"
-                description="Never write from scratch again. Go from idea to blog in minutes."
+                title="Hens And Chicks"
+                href="/products"
+                src="https://ik.imagekit.io/charanraj/Poultry/Products%20Poultry-Hen%20and%20heaven/hen-and-chicks.png"
+                description="Fresh hens and chicks from our farm can be purchased for farming and business"
               />
               <ProductItem
-                title="Rogue"
-                href="https://userogue.com"
-                src="https://assets.aceternity.com/demos/Screenshot+2024-02-21+at+11.47.07%E2%80%AFPM.png"
-                description="Respond to government RFPs, RFIs and RFQs 10x faster using AI"
+                title="Bulk Feeds, Eggs and Chickens"
+                href="/products"
+                src="https://ik.imagekit.io/charanraj/Poultry/Products%20Poultry-Hen%20and%20heaven/10kg-20kg-50kg-chicken-feeds.webp"
+                description="Bulk orders for feeds, eggs and chickens are available"
               />
             </div>
           </MenuItem>
@@ -147,7 +147,7 @@ function Navbar({ className }: { className?: string }) {
               {userData.userRole === "admin" ? (
                 <Link to="/dashboard">
                   <button className="inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-red-900 px-4 font-medium dark:text-white text-black-2 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:ring-offset-slate-50">
-                    <User className="mr-2 h-4 w-4" />
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span className="max-w-[100px] truncate">Dashboard</span>
                   </button>
                 </Link>
@@ -159,14 +159,12 @@ function Navbar({ className }: { className?: string }) {
                   </span>
                 </button>
               )}
-              {/* Dropdown menu */}
+
               <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                 <button className="flex px-4 py-2 text-sm dark:text-white text-black-2 ">
                   <User className="mr-2 h-4 w-4" />
                   {userData.fullName}
                 </button>
-
-                {/* Conditionally render the Dashboard button for admin users */}
 
                 <button
                   onClick={handleLogout}

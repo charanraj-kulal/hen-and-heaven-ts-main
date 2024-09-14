@@ -14,6 +14,7 @@ interface ProductItem {
   finalPrice: number;
   status: "active" | "inactive";
   productType: string;
+  productSubType: string; // Add productSubType field
 }
 
 interface EditProductModalProps {
@@ -36,11 +37,60 @@ const EditInventoryModal: React.FC<EditProductModalProps> = ({
     item.discountedPrice !== null
   );
 
+  const subTypeOptions: { [key: string]: string[] } = {
+    eggs: [
+      "Standard White Eggs",
+      "Standard Brown Eggs",
+      "Furnished / Enriched / Nest-Laid Eggs",
+      "Vitamin-Enhanced Eggs",
+      "Vegetarian Eggs",
+      "Processed Eggs",
+    ],
+    chickens: [
+      "Boiler Chicken",
+      "Tyson Chicken",
+      "Delaware Chicken",
+      "Jersey Giant Chicken",
+      "Desi Chicken",
+      "Breast Pieces",
+      "Tenderloins Pieces",
+      "Thighs",
+      "Drumsticks",
+      "Wings",
+      "Neck",
+      "Back",
+    ],
+    "hens-and-chicks": [
+      "Boiler Chicken",
+      "Tyson Chicken",
+      "Delaware Chicken",
+      "Jersey Giant Chicken",
+      "Desi Chicken",
+      "Colored Chicks",
+    ],
+    "bulk-eggs-chickens-feeds": [
+      "30-300 Crate Eggs",
+      "30-500kg Chicken Meats",
+      "30-1000 Chicks",
+      "30-500 Chickens",
+      "30-200 Feed Bags",
+      "30kg-100kg Feed Bags",
+    ],
+  };
+
   useEffect(() => {
     if (editedItem.productType) {
       fetchAvailableImages();
     }
   }, [editedItem.productType]);
+
+  useEffect(() => {
+    calculateFinalPrice(editedItem);
+  }, [
+    editedItem.actualPrice,
+    editedItem.discountType,
+    editedItem.discountedPrice,
+  ]);
 
   const fetchAvailableImages = async () => {
     const folderMap: { [key: string]: string } = {
@@ -75,11 +125,7 @@ const EditInventoryModal: React.FC<EditProductModalProps> = ({
     setEditedItem((prev) => ({ ...prev, [name]: value }));
 
     if (name === "productType") {
-      setEditedItem((prev) => ({ ...prev, imageUrl: "" }));
-    }
-
-    if (name === "actualPrice" || name === "discountedPrice") {
-      calculateFinalPrice({ ...editedItem, [name]: value });
+      setEditedItem((prev) => ({ ...prev, imageUrl: "", productSubType: "" }));
     }
   };
 
@@ -95,11 +141,6 @@ const EditInventoryModal: React.FC<EditProductModalProps> = ({
       discountType: isChecked ? "percentage" : null,
       discountedPrice: isChecked ? 0 : null,
     }));
-    calculateFinalPrice({
-      ...editedItem,
-      discountType: isChecked ? "percentage" : null,
-      discountedPrice: isChecked ? 0 : null,
-    });
   };
 
   const calculateFinalPrice = (data: ProductItem) => {
@@ -175,11 +216,34 @@ const EditInventoryModal: React.FC<EditProductModalProps> = ({
                   className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
                   required
                 >
-                  <option value="">Select Product Type</option>
-                  <option value="eggs">Eggs</option>
-                  <option value="chickens">Chickens</option>
-                  <option value="hens-and-chicks">Hens and Chicks</option>
-                  <option value="bulk-eggs-chickens-feeds">
+                  <option
+                    className=" text-black dark:text-white dark:bg-black bg-white"
+                    value=""
+                  >
+                    Select Product Type
+                  </option>
+                  <option
+                    className=" text-black dark:text-white dark:bg-black bg-white"
+                    value="eggs"
+                  >
+                    Eggs
+                  </option>
+                  <option
+                    className=" text-black dark:text-white dark:bg-black bg-white"
+                    value="chickens"
+                  >
+                    Chickens
+                  </option>
+                  <option
+                    className=" text-black dark:text-white dark:bg-black bg-white"
+                    value="hens-and-chicks"
+                  >
+                    Hens and Chicks
+                  </option>
+                  <option
+                    className=" text-black dark:text-white dark:bg-black bg-white"
+                    value="bulk-eggs-chickens-feeds"
+                  >
                     Bulk Eggs, Chickens, Feeds
                   </option>
                 </select>
@@ -207,6 +271,30 @@ const EditInventoryModal: React.FC<EditProductModalProps> = ({
                   </div>
                 ))}
               </div>
+            </div>
+            {/* Sub Product Dropdown */}
+            <div className="w-full mb-2">
+              <label
+                htmlFor="productSubType"
+                className="block mb-2 text-gray-700 dark:text-gray-300"
+              >
+                Product Sub-Type
+              </label>
+              <select
+                id="productSubType"
+                name="productSubType"
+                value={editedItem.productSubType}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                required
+              >
+                <option value="">Select Sub-Type</option>
+                {subTypeOptions[editedItem.productType]?.map((subType) => (
+                  <option key={subType} value={subType}>
+                    {subType}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="flex space-x-4 mb-4">

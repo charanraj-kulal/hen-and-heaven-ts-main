@@ -1,16 +1,16 @@
 import Nav from "../components/Nav";
-import ProductBuyingPage from "../components/UserProducts";
+import UserCart from "../components/UserCart";
 import Footer from "../components/Footer";
 import { UserProvider } from "../hooks/UserContext";
 
-const UserProductsPage = () => {
+const UserCartpage = () => {
   return (
     <UserProvider>
       <Nav />
-      <ProductBuyingPage />
+      <UserCart />
       <Footer />
     </UserProvider>
   );
 };
 
-export default UserProductsPage;
+export default UserCartpage;
