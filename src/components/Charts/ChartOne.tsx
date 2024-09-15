@@ -8,11 +8,11 @@ const ReactApexChart = React.lazy(() => import("react-apexcharts"));
 
 const options: ApexOptions = {
   legend: {
-    show: false,
+    show: true,
     position: "top",
     horizontalAlign: "left",
   },
-  colors: ["#3C50E0", "#80CAEE"],
+  colors: ["#3C50E0", "#10B981"],
   chart: {
     fontFamily: "Satoshi, sans-serif",
     height: 335,
@@ -49,7 +49,7 @@ const options: ApexOptions = {
   ],
   stroke: {
     width: [2, 2],
-    curve: "straight",
+    curve: "smooth",
   },
   grid: {
     xaxis: {
@@ -69,23 +69,18 @@ const options: ApexOptions = {
   markers: {
     size: 4,
     colors: "#fff",
-    strokeColors: ["#3056D3", "#80CAEE"],
+    strokeColors: ["#3C50E0", "#10B981"],
     strokeWidth: 3,
     strokeOpacity: 0.9,
     strokeDashArray: 0,
     fillOpacity: 1,
     hover: {
-      size: undefined,
-      sizeOffset: 5,
+      size: 6,
     },
   },
   xaxis: {
     type: "category",
     categories: [
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
       "Jan",
       "Feb",
       "Mar",
@@ -94,6 +89,10 @@ const options: ApexOptions = {
       "Jun",
       "Jul",
       "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ],
     axisBorder: {
       show: false,
@@ -104,36 +103,45 @@ const options: ApexOptions = {
   },
   yaxis: {
     title: {
+      text: "Amount (₹)",
       style: {
-        fontSize: "0px",
+        fontSize: "14px",
+        fontWeight: 500,
       },
     },
     min: 0,
-    max: 100,
+    max: 100000,
+    tickAmount: 5,
+  },
+  tooltip: {
+    y: {
+      formatter: function (val: number) {
+        return "₹" + val.toLocaleString("en-IN");
+      },
+    },
   },
 };
 
-interface ChartOneState {
-  series: {
-    name: string;
-    data: number[];
-  }[];
-}
-
-const ChartOne: React.FC = () => {
+const RevenueNetProfitChart: React.FC = () => {
   const series = [
     {
-      name: "Product One",
-      data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
+      name: "Revenue",
+      data: [
+        45000, 52000, 38000, 61000, 55000, 70000, 80000, 75000, 68000, 72000,
+        83000, 90000,
+      ],
     },
     {
-      name: "Product Two",
-      data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39, 51],
+      name: "Net Profit",
+      data: [
+        18000, 21000, 15000, 24000, 22000, 28000, 32000, 30000, 27000, 29000,
+        33000, 36000,
+      ],
     },
   ];
 
   return (
-    <div className="col-span-12 rounded-sm border  border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
+    <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
       <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
         <div className="flex w-full flex-wrap gap-3 sm:gap-5">
           <div className="flex min-w-47.5">
@@ -142,7 +150,7 @@ const ChartOne: React.FC = () => {
             </span>
             <div className="w-full">
               <p className="font-semibold text-primary">Total Revenue</p>
-              <p className="text-sm font-medium">12.04.2022 - 12.05.2022</p>
+              <p className="text-sm font-medium">Current Year</p>
             </div>
           </div>
           <div className="flex min-w-47.5">
@@ -150,28 +158,28 @@ const ChartOne: React.FC = () => {
               <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-secondary"></span>
             </span>
             <div className="w-full">
-              <p className="font-semibold text-secondary">Total Sales</p>
-              <p className="text-sm font-medium">12.04.2022 - 12.05.2022</p>
+              <p className="font-semibold text-secondary">Net Profit</p>
+              <p className="text-sm font-medium">Current Year</p>
             </div>
           </div>
         </div>
         <div className="flex w-full max-w-45 justify-end">
           <div className="inline-flex items-center rounded-md bg-whiter p-1.5 dark:bg-meta-4">
             <button className="rounded bg-white px-3 py-1 text-xs font-medium text-black shadow-card hover:bg-white hover:shadow-card dark:bg-boxdark dark:text-white dark:hover:bg-boxdark">
-              Day
-            </button>
-            <button className="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark">
-              Week
-            </button>
-            <button className="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark">
               Month
+            </button>
+            <button className="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark">
+              Quarter
+            </button>
+            <button className="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark">
+              Year
             </button>
           </div>
         </div>
       </div>
 
       <div>
-        <div id="chartOne" className="-ml-5">
+        <div id="revenueNetProfitChart" className="-ml-5 mt-5">
           <Suspense fallback={<div>Loading...</div>}>
             <ReactApexChart
               options={options}
@@ -187,4 +195,4 @@ const ChartOne: React.FC = () => {
   );
 };
 
-export default ChartOne;
+export default RevenueNetProfitChart;

@@ -62,6 +62,19 @@ export type Order = {
   id: string;
   buyerId: string;
   buyerName: string;
+  shippingAddress: Array<{
+    city: string;
+    country: string;
+    state: string;
+    street: string;
+    zipCode: string;
+  }>;
+  // shippingAddress: String;
+  // city: string;
+  // country: string;
+  // state: string;
+  // street: string;
+  // zipCode: string;
   createdAt: Date;
   productPrice: number;
   totalProducts: number;
@@ -180,7 +193,30 @@ const OrdersTable: React.FC = () => {
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ row }) => <div>{row.getValue("status")}</div>,
+      cell: ({ row }) => {
+        const status = row.getValue("status") as string;
+        let bgColor = "";
+        switch (status) {
+          case "placed":
+            bgColor = "bg-red-400";
+            break;
+          case "shipped":
+            bgColor = "bg-yellow-200";
+            break;
+          case "delivered":
+            bgColor = "bg-green-300";
+            break;
+          default:
+            bgColor = "bg-gray-300";
+        }
+        return (
+          <div
+            className={`px-2 py-1 rounded-full text-black-2 text-center ${bgColor}`}
+          >
+            {status}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "createdAt",
@@ -308,14 +344,14 @@ const OrdersTable: React.FC = () => {
       <div className="rounded-sm border p-4 border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex items-center py-4">
           <Input
-            placeholder="Filter by buyer..."
+            placeholder="Search by buyer name..."
             value={
               (table.getColumn("buyerId")?.getFilterValue() as string) ?? ""
             }
             onChange={(event) =>
               table.getColumn("buyerId")?.setFilterValue(event.target.value)
             }
-            className="max-w-sm"
+            className="max-w-sm mr-4"
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

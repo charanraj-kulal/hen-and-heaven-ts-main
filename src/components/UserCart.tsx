@@ -309,6 +309,21 @@ const UserCart: React.FC = () => {
 
               const productData = await Promise.all(productReads);
 
+              // Get the current hen-and-heaven summary
+              const henAndHeavenRef = doc(
+                db,
+                "hen-and-heaven",
+                "gNfmJEedFjmg8g6I7vMO"
+              );
+              const henAndHeavenDoc = await transaction.get(henAndHeavenRef);
+              if (!henAndHeavenDoc.exists()) {
+                throw new Error("Hen and Heaven summary not found");
+              }
+              const henAndHeavenData = henAndHeavenDoc.data();
+
+              // Calculate total revenue from this order
+              const totalRevenue = orderDetails.totalAmount;
+
               // Now perform all write operations
               for (const { item, productDoc } of productData) {
                 const currentProductData = productDoc.data();
@@ -324,6 +339,16 @@ const UserCart: React.FC = () => {
                   status: newStock === 0 ? "inactive" : "active",
                 });
               }
+
+              // Update hen-and-heaven summary
+              transaction.update(henAndHeavenRef, {
+                totalRevenue: henAndHeavenData.totalRevenue + totalRevenue,
+                netProfit:
+                  henAndHeavenData.netProfit +
+                  (totalRevenue -
+                    orderDetails.gst -
+                    orderDetails.convenienceFee),
+              });
 
               // Create order document
               const completeOrderDetails = {

@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBasket, ShoppingCart, X } from "lucide-react";
 import { useUser } from "../hooks/UserContext"; // adjust path as needed
-import { collection, addDoc, updateDoc, getDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  updateDoc,
+  getDoc,
+  doc,
+  runTransaction,
+} from "firebase/firestore";
 import { db } from "../../firebase"; // adjust path to your firebase setup
 import { toast } from "react-toastify";
 import AddressFormDialog from "./AddressFormDialog";
@@ -143,65 +149,79 @@ const ProductModal: React.FC<ProductModalProps> = ({
         description: `Purchase of ${product.name}`,
         order_id: orderData.id, // This is the order ID returned from your server
         handler: async function (response: any) {
-          // Calculate order details
-          const gst = product.finalPrice * 0.18;
-          const convenienceFee = product.finalPrice * 0.02;
-          const totalAmount = product.finalPrice + gst + convenienceFee;
-
-          // Create order object
-          const orderDetails = {
-            buyerId: userData.uid,
-            buyerName: userData.fullName,
-            products: [{ ...product, quantity: 1 }],
-            totalProducts: 1,
-            productPrice: product.finalPrice,
-            gst: gst,
-            convenienceFee: convenienceFee,
-            totalAmount: totalAmount,
-            paymentId: response.razorpay_payment_id || null,
-            orderId: orderData.id, // Use the order ID from the server response
-            signature: response.razorpay_signature || null,
-            status: "placed",
-            shippingAddress: userAddress,
-            createdAt: new Date(),
-          };
-
           try {
-            // Store order in Firestore
-            await addDoc(collection(db, "orders"), orderDetails);
+            await runTransaction(db, async (transaction) => {
+              // Read operations
+              const productRef = doc(db, "products", product.id);
+              const productDoc = await transaction.get(productRef);
+              const henAndHeavenRef = doc(
+                db,
+                "hen-and-heaven",
+                "gNfmJEedFjmg8g6I7vMO"
+              );
+              const henAndHeavenDoc = await transaction.get(henAndHeavenRef);
 
-            // Fetch the product document from Firestore
-            const productRef = doc(db, "products", product.id);
-            const productDoc = await getDoc(productRef);
-
-            if (productDoc.exists()) {
-              const currentStock = productDoc.data().stock;
-
-              if (currentStock > 0) {
-                // Decrement the stock by 1
-                const updatedStock = currentStock - 1;
-
-                // If stock is 1, set the status to inactive, else keep it active
-                const newStatus = updatedStock === 0 ? "inactive" : "active";
-
-                // Update the product document in Firestore
-                await updateDoc(productRef, {
-                  stock: updatedStock,
-                  status: newStatus,
-                });
-
-                toast.success("Order placed successfully!!");
-              } else {
-                toast.error("Product is out of stock.");
+              if (!productDoc.exists()) {
+                throw new Error("Product not found.");
               }
-            } else {
-              toast.error("Product not found.");
-            }
+              if (!henAndHeavenDoc.exists()) {
+                throw new Error("Hen and Heaven summary not found");
+              }
+
+              const currentStock = productDoc.data().stock;
+              const henAndHeavenData = henAndHeavenDoc.data();
+
+              if (currentStock <= 0) {
+                throw new Error("Product is out of stock.");
+              }
+
+              // Calculate order details
+              const gst = product.finalPrice * 0.18;
+              const convenienceFee = product.finalPrice * 0.02;
+              const totalAmount = product.finalPrice + gst + convenienceFee;
+
+              // Create order object
+              const orderDetails = {
+                buyerId: userData.uid,
+                buyerName: userData.fullName,
+                products: [{ ...product, quantity: 1 }],
+                totalProducts: 1,
+                productPrice: product.finalPrice,
+                gst: gst,
+                convenienceFee: convenienceFee,
+                totalAmount: totalAmount,
+                paymentId: response.razorpay_payment_id || null,
+                orderId: orderData.id,
+                signature: response.razorpay_signature || null,
+                status: "placed",
+                shippingAddress: userAddress,
+                createdAt: new Date(),
+              };
+
+              // Write operations
+              const orderRef = doc(collection(db, "orders"));
+              transaction.set(orderRef, orderDetails);
+
+              const updatedStock = currentStock - 1;
+              const newStatus = updatedStock === 0 ? "inactive" : "active";
+              transaction.update(productRef, {
+                stock: updatedStock,
+                status: newStatus,
+              });
+
+              transaction.update(henAndHeavenRef, {
+                totalRevenue: henAndHeavenData.totalRevenue + totalAmount,
+                netProfit:
+                  henAndHeavenData.netProfit +
+                  (totalAmount - gst - convenienceFee),
+              });
+            });
+
+            toast.success("Order placed successfully!");
           } catch (error) {
             console.error("Error processing order and updating stock:", error);
             toast.error("Failed to complete order. Please contact support.");
           }
-
           onClose();
         },
         prefill: {

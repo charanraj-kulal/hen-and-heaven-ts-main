@@ -125,7 +125,7 @@ export const SkeletonOne = () => {
         <div className="flex flex-1 w-full h-full flex-col space-y-2  ">
           {/* TODO */}
           <img
-            src="https://ik.imagekit.io/charanraj/UI/aantarya2%20(1).png"
+            src="https://ik.imagekit.io/charanraj/Poultry/Products%20Poultry-Hen%20and%20heaven/image.png"
             alt="header"
             width={800}
             height={800}
@@ -152,8 +152,8 @@ export const SkeletonThree = () => {
           {/* TODO */}
           <div className="p-1 border rounded-3xl dark:bg-neutral-900 bg-neutral-100  border-neutral-200 dark:border-neutral-800 ">
             <Compare
-              firstImage="https://assets.aceternity.com/code-problem.png"
-              secondImage="https://assets.aceternity.com/code-solution.png"
+              firstImage="https://ik.imagekit.io/charanraj/Poultry/Products%20Poultry-Hen%20and%20heaven/image.png"
+              secondImage="https://ik.imagekit.io/charanraj/Poultry/Products%20Poultry-Hen%20and%20heaven/image(1).png"
               firstImageClassName="object-cover object-left-top"
               secondImageClassname="object-cover object-left-top"
               className="h-[250px] w-[200px] md:h-[500px] md:w-full"

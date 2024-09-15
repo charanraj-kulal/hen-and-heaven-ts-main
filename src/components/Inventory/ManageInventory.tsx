@@ -6,6 +6,7 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  getDoc,
 } from "firebase/firestore";
 import {
   PlusCircle,
@@ -91,19 +92,80 @@ const ManageInventory: React.FC = () => {
   };
 
   const handleSave = async (item: InventoryItemWithChanges) => {
-    await updateDoc(doc(db, "inventory", item.id), {
-      quantity: item.newQuantity,
-      cost: item.newCost,
-    });
-    await fetchInventoryItems();
-    toast.success("Item updated successfully");
+    try {
+      const henAndHeavenDoc = doc(db, "hen-and-heaven", "gNfmJEedFjmg8g6I7vMO");
+      const docSnap = await getDoc(henAndHeavenDoc);
+
+      if (docSnap.exists()) {
+        const { totalRevenue, expense, totalInventoryCost } = docSnap.data();
+
+        const oldTotalCost = item.quantity * item.cost;
+        const newTotalCost = item.newQuantity * item.newCost;
+        const costDifference = newTotalCost - oldTotalCost;
+
+        // Update hen-and-heaven document
+        await updateDoc(henAndHeavenDoc, {
+          totalRevenue: totalRevenue - costDifference,
+          expense: expense + costDifference,
+          totalInventoryCost: totalInventoryCost + costDifference,
+        });
+
+        // Update inventory item
+        await updateDoc(doc(db, "inventory", item.id), {
+          quantity: item.newQuantity,
+          cost: item.newCost,
+        });
+
+        await fetchInventoryItems();
+        toast.success("Item updated successfully");
+      } else {
+        toast.error("Error fetching financial data.");
+      }
+    } catch (error) {
+      console.error("Error updating item:", error);
+      toast.error("Error updating item. Please try again.");
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
-      await deleteDoc(doc(db, "inventory", id));
-      await fetchInventoryItems();
-      toast.success("Item deleted successfully");
+      try {
+        const itemToDelete = inventoryItems.find((item) => item.id === id);
+        if (!itemToDelete) {
+          throw new Error("Item not found");
+        }
+
+        const henAndHeavenDoc = doc(
+          db,
+          "hen-and-heaven",
+          "gNfmJEedFjmg8g6I7vMO"
+        );
+        const docSnap = await getDoc(henAndHeavenDoc);
+
+        if (docSnap.exists()) {
+          const { totalRevenue, expense, totalInventoryCost } = docSnap.data();
+
+          const totalCost = itemToDelete.quantity * itemToDelete.cost;
+
+          // Update hen-and-heaven document
+          await updateDoc(henAndHeavenDoc, {
+            totalRevenue: totalRevenue + totalCost,
+            expense: expense - totalCost,
+            totalInventoryCost: totalInventoryCost - totalCost,
+          });
+
+          // Delete inventory item
+          await deleteDoc(doc(db, "inventory", id));
+
+          await fetchInventoryItems();
+          toast.success("Item deleted successfully");
+        } else {
+          toast.error("Error fetching financial data.");
+        }
+      } catch (error) {
+        console.error("Error deleting item:", error);
+        toast.error("Error deleting item. Please try again.");
+      }
     }
   };
 
@@ -113,19 +175,52 @@ const ManageInventory: React.FC = () => {
   };
 
   const handleUpdate = async (updatedItem: InventoryItem) => {
-    const itemData = {
-      name: updatedItem.name,
-      description: updatedItem.description,
-      quantity: updatedItem.quantity,
-      cost: updatedItem.cost,
-      status: updatedItem.status,
-      imageUrl: updatedItem.imageUrl,
-    };
+    try {
+      const henAndHeavenDoc = doc(db, "hen-and-heaven", "gNfmJEedFjmg8g6I7vMO");
+      const docSnap = await getDoc(henAndHeavenDoc);
 
-    await updateDoc(doc(db, "inventory", updatedItem.id), itemData);
-    await fetchInventoryItems();
-    setIsEditModalOpen(false);
-    toast.success("Item updated successfully");
+      if (docSnap.exists()) {
+        const { totalRevenue, expense, totalInventoryCost } = docSnap.data();
+
+        const originalItem = inventoryItems.find(
+          (item) => item.id === updatedItem.id
+        );
+        if (!originalItem) {
+          throw new Error("Original item not found");
+        }
+
+        const oldTotalCost = originalItem.quantity * originalItem.cost;
+        const newTotalCost = updatedItem.quantity * updatedItem.cost;
+        const costDifference = newTotalCost - oldTotalCost;
+
+        // Update hen-and-heaven document
+        await updateDoc(henAndHeavenDoc, {
+          totalRevenue: totalRevenue - costDifference,
+          expense: expense + costDifference,
+          totalInventoryCost: totalInventoryCost + costDifference,
+        });
+
+        // Update inventory item
+        const itemData = {
+          name: updatedItem.name,
+          description: updatedItem.description,
+          quantity: updatedItem.quantity,
+          cost: updatedItem.cost,
+          status: updatedItem.status,
+          imageUrl: updatedItem.imageUrl,
+        };
+        await updateDoc(doc(db, "inventory", updatedItem.id), itemData);
+
+        await fetchInventoryItems();
+        setIsEditModalOpen(false);
+        toast.success("Item updated successfully");
+      } else {
+        toast.error("Error fetching financial data.");
+      }
+    } catch (error) {
+      console.error("Error updating item:", error);
+      toast.error("Error updating item. Please try again.");
+    }
   };
 
   return (

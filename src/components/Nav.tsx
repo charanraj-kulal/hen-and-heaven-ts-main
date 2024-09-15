@@ -88,16 +88,17 @@ function Navbar({ className }: { className?: string }) {
         {/* Navigation Items */}
         <Menu setActive={setActive} className="flex-grow flex justify-center">
           <MenuItem setActive={setActive} active={active} item="Home">
-            <HoveredLink href="/">Home</HoveredLink>
+            <HoveredLink to="/">Home</HoveredLink>
           </MenuItem>
           <MenuItem setActive={setActive} active={active} item="Services">
             <div className="flex flex-col space-y-4 text-sm">
-              <HoveredLink href="/web-dev">Franchise</HoveredLink>
-              <HoveredLink href="/interface-design">Breeding</HoveredLink>
-              <HoveredLink href="/seo">Bulk Orders</HoveredLink>
-              <HoveredLink href="/branding">Sales</HoveredLink>
+              <HoveredLink to="/franchise">Franchise</HoveredLink>
+              <HoveredLink to="/breeding">Breeding</HoveredLink>
+              <HoveredLink to="/bulk-orders">Bulk Orders</HoveredLink>
+              <HoveredLink to="/sales">Sales</HoveredLink>
             </div>
           </MenuItem>
+
           <MenuItem setActive={setActive} active={active} item="Products">
             <div className="text-sm grid grid-cols-2 gap-10 p-4">
               <ProductItem
@@ -126,12 +127,14 @@ function Navbar({ className }: { className?: string }) {
               />
             </div>
           </MenuItem>
-          <MenuItem setActive={setActive} active={active} item="Pricing">
+          <MenuItem setActive={setActive} active={active} item="Track Order">
             <div className="flex flex-col space-y-4 text-sm">
-              <HoveredLink href="/hobby">Hobby</HoveredLink>
-              <HoveredLink href="/individual">Individual</HoveredLink>
+              <HoveredLink href="/track-your-order">
+                Track Your Order
+              </HoveredLink>
+              {/* <HoveredLink href="/individual">Individual</HoveredLink>
               <HoveredLink href="/team">Team</HoveredLink>
-              <HoveredLink href="/enterprise">Enterprise</HoveredLink>
+              <HoveredLink href="/enterprise">Enterprise</HoveredLink> */}
             </div>
           </MenuItem>
         </Menu>

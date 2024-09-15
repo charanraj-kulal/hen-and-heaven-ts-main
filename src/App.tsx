@@ -9,6 +9,9 @@ import ManageProductPage from "./pages/Product/ManageProduct";
 import ProductBuyingPage from "./pages/Products";
 import UserCartpage from "./pages/userCartPage";
 import LoginRegister from "./pages/LoginRegisterForm";
+import Franchise from "./pages/Franchise";
+import BulkOrders from "./pages/BulkOrders";
+import Sales from "./pages/Sales";
 import Dashboard from "./pages/Dashboard";
 import { UserProvider } from "../src/hooks/UserContext";
 import { ThemeProvider } from "../src/components/theme-provider";
@@ -21,6 +24,7 @@ import "./index.css";
 // Fonts setup
 import "./fonts/GeistVF.woff";
 import "./fonts/GeistMonoVF.woff";
+import Breeding from "./pages/Breeding";
 
 const ProtectedDashboard = withAuth(Dashboard);
 const ProtectedAddInventory = withAuth(AddInventoryPage);
@@ -42,6 +46,11 @@ const App: React.FC = () => {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/breeding" element={<Breeding />} />
+            <Route path="/franchise" element={<Franchise />} />
+            <Route path="/bulk-orders" element={<BulkOrders />} />
+            <Route path="/sales" element={<Sales />} />
             <Route path="/login-register" element={<LoginRegister />} />
             <Route path="/products" element={<ProductBuyingPage />} />
             <Route path="/cart" element={<UserCartpage />} />

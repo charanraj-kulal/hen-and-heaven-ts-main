@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import DefaultLayout from "../../components/Layouts/DefaultLayout";
 import { ref, listAll, getDownloadURL } from "firebase/storage";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
 import { useUser } from "../../hooks/UserContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -60,26 +67,58 @@ const InventoryAdd: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await addDoc(collection(db, "inventory"), {
-        ...formData,
-        imageUrl: selectedImageUrl,
-        addedBy: userData?.uid,
-        addedAt: serverTimestamp(),
-      });
+      // Fetch the current financial data
+      const henAndHeavenDoc = doc(db, "hen-and-heaven", "gNfmJEedFjmg8g6I7vMO");
+      const docSnap = await getDoc(henAndHeavenDoc);
+      if (docSnap.exists()) {
+        const {
+          capital,
+          expense,
+          netProfit,
+          totalInventoryCost,
+          totalRevenue,
+        } = docSnap.data();
 
-      toast.success("Inventory added successfully!");
+        const cost = parseFloat(formData.cost);
+        const quantity = parseInt(formData.quantity);
+        const totalCost = cost * quantity;
 
-      // Reset form
-      setFormData({
-        name: "",
-        description: "",
-        status: "active",
-        cost: "",
-        quantity: "",
-      });
-      setSelectedImageUrl(null);
+        if (totalCost > totalRevenue) {
+          toast.error("Insufficient revenue to add inventory.");
+          setIsLoading(false);
+          return;
+        }
 
-      // Navigate to the inventory list page after a short delay
+        // Add inventory item
+        await addDoc(collection(db, "inventory"), {
+          ...formData,
+          imageUrl: selectedImageUrl,
+          addedBy: userData?.uid,
+          addedAt: serverTimestamp(),
+        });
+
+        // Update financial data
+        await updateDoc(henAndHeavenDoc, {
+          totalRevenue: totalRevenue - totalCost,
+          expense: expense + totalCost,
+          totalInventoryCost: totalInventoryCost + totalCost,
+          netProfit: netProfit - totalCost,
+        });
+
+        toast.success("Inventory added successfully!");
+
+        // Reset form
+        setFormData({
+          name: "",
+          description: "",
+          status: "active",
+          cost: "",
+          quantity: "",
+        });
+        setSelectedImageUrl(null);
+      } else {
+        toast.error("Error fetching financial data.");
+      }
     } catch (error) {
       console.error("Error adding inventory:", error);
       toast.error("Error adding inventory. Please try again.");

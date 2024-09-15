@@ -23,10 +23,22 @@ interface OrderDetailsDialogProps {
   onClose: () => void;
 }
 
+interface ShippingAddress {
+  country: string;
+  street: string;
+  city: string;
+  zipCode: string;
+  state: string;
+}
+
 export const OrderDetailsDialog: React.FC<OrderDetailsDialogProps> = ({
   order,
   onClose,
 }) => {
+  const formatShippingAddress = (address: ShippingAddress) => {
+    return `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, ${address.country}`;
+  };
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[805px] sm:max-h-[600px] overflow-y-auto">
@@ -50,6 +62,19 @@ export const OrderDetailsDialog: React.FC<OrderDetailsDialogProps> = ({
               <TableRow>
                 <TableCell className="font-semibold">Status:</TableCell>
                 <TableCell className="capitalize">{order.status}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-semibold">
+                  Shipping Address:
+                </TableCell>
+                <TableCell>
+                  {order.shippingAddress &&
+                  typeof order.shippingAddress === "object"
+                    ? formatShippingAddress(
+                        order.shippingAddress as unknown as ShippingAddress
+                      )
+                    : "N/A"}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="font-semibold">Total Products:</TableCell>
