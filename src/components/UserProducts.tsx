@@ -15,6 +15,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProductModal from "../components/ProductModal";
 import { List, ShoppingCart } from "lucide-react";
+import ProductSkeleton from "../components/Skeleton/ProductSkeleton";
 
 interface ProductItem {
   id: string;
@@ -35,6 +36,8 @@ interface CartItem extends ProductItem {
 }
 const ProductBuyingPage: React.FC = () => {
   const [products, setProducts] = useState<ProductItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const { userData } = useUser();
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(
@@ -46,6 +49,7 @@ const ProductBuyingPage: React.FC = () => {
   }, []);
 
   const fetchProducts = async () => {
+    setIsLoading(true);
     try {
       const q = query(
         collection(db, "products"),
@@ -57,8 +61,10 @@ const ProductBuyingPage: React.FC = () => {
         productsArray.push({ id: doc.id, ...doc.data() } as ProductItem);
       });
       setProducts(productsArray);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching products:", error);
+      setIsLoading(false);
     }
   };
 
@@ -129,67 +135,63 @@ const ProductBuyingPage: React.FC = () => {
           {productType.replace("-", " & ")}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {sortedProducts.map((product) => (
-            <MagicCard
-              key={product.id}
-              className="relative transition duration-700 ease-in-out flex flex-col items-center justify-between p-4 border border-white/30 hover:border-white/50 rounded-xl"
-              gradientColor="#FF5733"
-            >
-              {product.discountedPrice && (
-                <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                  OFFER
-                </div>
-              )}
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-full h-40 object-cover rounded mb-4"
-              />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                {product.name}
-              </h3>
-              <div className="flex items-center justify-center mb-4">
-                {product.discountedPrice ? (
-                  <>
-                    <p className="text-gray-500 dark:text-gray-400 line-through mr-2">
-                      ₹{product.actualPrice}
-                    </p>
-                    <p className="text-green-600 dark:text-green-400 font-bold">
-                      ₹{product.finalPrice}
-                    </p>
-                  </>
-                ) : (
-                  <p className="text-gray-900 dark:text-white font-bold">
-                    ₹{product.finalPrice}
-                  </p>
-                )}
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => openModal(product)}
-                  className="inline-flex h-10 items-center justify-center rounded-md
-                  bg-gradient-to-r from-blue-500 to-blue-900 px-4 font-medium
-                  text-white transition-colors focus:outline-none focus:ring-2
-                  focus:ring-slate-900 focus:ring-offset-2
-                  focus:ring-offset-slate-50"
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <ProductSkeleton key={index} />
+              ))
+            : sortedProducts.map((product) => (
+                <MagicCard
+                  key={product.id}
+                  className="relative transition duration-700 ease-in-out flex flex-col items-center justify-between p-4 border border-white/30 hover:border-white/50 rounded-xl"
+                  gradientColor="#FF5733"
                 >
-                  <List size={20} className="mr-1" />
-                  View Details
-                </button>
-                <button
-                  onClick={() => addToCart(product)}
-                  className="inline-flex h-10 items-center justify-center rounded-md
-                  bg-gradient-to-r from-red-500 to-red-900 px-4 font-medium
-                  text-white transition-colors focus:outline-none focus:ring-2
-                  focus:ring-slate-900 focus:ring-offset-2
-                  focus:ring-offset-slate-50"
-                >
-                  <ShoppingCart size={20} className="mr-1" />
-                  Add to Cart
-                </button>
-              </div>
-            </MagicCard>
-          ))}
+                  {product.discountedPrice && (
+                    <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                      OFFER
+                    </div>
+                  )}
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="w-full h-40 object-cover rounded mb-4"
+                  />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    {product.name}
+                  </h3>
+                  <div className="flex items-center justify-center mb-4">
+                    {product.discountedPrice ? (
+                      <>
+                        <p className="text-gray-500 dark:text-gray-400 line-through mr-2">
+                          ₹{product.actualPrice}
+                        </p>
+                        <p className="text-green-600 dark:text-green-400 font-bold">
+                          ₹{product.finalPrice}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-gray-900 dark:text-white font-bold">
+                        ₹{product.finalPrice}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => openModal(product)}
+                      className="inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-blue-500 to-blue-900 px-4 font-medium text-white transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:ring-offset-slate-50"
+                    >
+                      <List size={20} className="mr-1" />
+                      View Details
+                    </button>
+                    <button
+                      onClick={() => addToCart(product)}
+                      className="inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-red-500 to-red-900 px-4 font-medium text-white transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:ring-offset-slate-50"
+                    >
+                      <ShoppingCart size={20} className="mr-1" />
+                      Add to Cart
+                    </button>
+                  </div>
+                </MagicCard>
+              ))}
         </div>
       </div>
     );
