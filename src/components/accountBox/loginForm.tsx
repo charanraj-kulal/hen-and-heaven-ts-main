@@ -21,7 +21,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { useUser } from "../../hooks/UserContext";
 import LottieLoader from "../LottieLoader";
-import { useNavigate } from "react-router-dom"; // Import from next/navigation instead of next/router
+import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps {}
 
@@ -33,7 +33,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate(); // Initialize useRouter hook from next/navigation
+  const navigate = useNavigate();
 
   const HandleBack: any = async () => {
     navigate("/");
@@ -123,6 +123,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
       toast.error("Login failed. Please check your credentials and try again.");
     }
   };
+
   return (
     <>
       <BoxContainer>

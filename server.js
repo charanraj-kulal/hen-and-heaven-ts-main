@@ -68,6 +68,7 @@ app.post("/api/login", async (req, res) => {
         name: userData.fullName,
         email: email,
         role: userData.userRole,
+        profileUrl: userData.profileUrl,
       },
       JWT_SECRET,
       { expiresIn: "1h" }
@@ -81,6 +82,7 @@ app.post("/api/login", async (req, res) => {
         email,
         fullName: userData.fullName,
         userRole: userData.userRole,
+        profileUrl: userData.profileUrl,
         // Add any other necessary user data
       },
     });

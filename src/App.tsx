@@ -8,6 +8,8 @@ import OrdersPage from "./pages/Orders/OrdersPage";
 import ManageProductPage from "./pages/Product/ManageProduct";
 import Settings from "./pages/Settings/Settings";
 import Profile from "./pages/Profile/Profile";
+import DailyEggCollectionPage from "./pages/EggCollection/EggCollectionPage";
+import PoultryHealthMonitorPage from "./pages/HealthMonitoring/HealthMonitoringPage";
 import ProductBuyingPage from "./pages/Products";
 import UserCartpage from "./pages/userCartPage";
 import LoginRegister from "./pages/LoginRegisterForm";
@@ -36,6 +38,8 @@ const ProtectedOrderPage = withAuth(OrdersPage);
 const ProtectedManageProduct = withAuth(ManageProductPage);
 const ProtectedSettings = withAuth(Settings);
 const ProtectedProfile = withAuth(Profile);
+const ProtectedDailyEggCollectionPage = withAuth(DailyEggCollectionPage);
+const ProtectedPoultryHealthMonitorPage = withAuth(PoultryHealthMonitorPage);
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -78,6 +82,14 @@ const App: React.FC = () => {
             <Route
               path="/dashboard/manage-product"
               element={<ProtectedManageProduct />}
+            />
+            <Route
+              path="/dashboard/egg-collections"
+              element={<ProtectedDailyEggCollectionPage />}
+            />
+            <Route
+              path="/dashboard/health-monitoring"
+              element={<ProtectedPoultryHealthMonitorPage />}
             />
             <Route path="/dashboard/orders" element={<ProtectedOrderPage />} />
           </Routes>

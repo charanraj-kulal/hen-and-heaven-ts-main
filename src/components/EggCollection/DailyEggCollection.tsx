@@ -12,6 +12,10 @@ import {
 import CardDataStats from "../CardDataStats";
 import { Egg, EggOff } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import DefaultLayout from "../../components/Layouts/DefaultLayout";
+import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import {
   Dialog,
   DialogContent,
@@ -21,15 +25,8 @@ import {
 } from "../../components/ui/dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { Suspense } from "react";
+import ApexChart from "react-apexcharts"; // Import ApexChart component
 
 const eggTypes = [
   "Standard White Eggs",
@@ -46,37 +43,29 @@ const DailyEggCollection: React.FC = () => {
   const [collectionData, setCollectionData] = useState<{
     [key: string]: number;
   }>({});
-  interface ChartData {
-    date: string;
-    [key: string]: number | string;
-  }
-
-  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]); // ApexChart needs `any[]` type
 
   useEffect(() => {
-    fetchTodayData();
+    fetchWeeklyData();
     fetchChartData();
   }, []);
 
-  const fetchTodayData = async () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayTimestamp = Timestamp.fromDate(today);
+  const fetchWeeklyData = async () => {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     const q = query(
       collection(db, "egg-collections"),
-      where("date", "==", todayTimestamp)
+      where("date", ">=", Timestamp.fromDate(sevenDaysAgo))
     );
 
     const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      const docData = querySnapshot.docs[0].data();
-      const collection: { [key: string]: number } = docData.collection;
-      setCollectionData(collection);
-      setTotalEggs(
-        Object.values(collection).reduce((a: number, b: number) => a + b, 0)
-      );
-    }
+    let total = 0;
+    querySnapshot.forEach((doc) => {
+      const collection: { [key: string]: number } = doc.data().collection;
+      total += Object.values(collection).reduce((a, b) => a + b, 0);
+    });
+    setTotalEggs(total); // Set total eggs collected over the week
   };
 
   const fetchChartData = async () => {
@@ -121,11 +110,30 @@ const DailyEggCollection: React.FC = () => {
     setCollectionData(collection);
     setTotalEggs(total);
     fetchChartData();
+    toast.success("Egg collection added successfully!");
   };
 
+  const chartOptions: ApexCharts.ApexOptions = {
+    chart: {
+      type: "bar",
+      height: 350,
+    },
+    xaxis: {
+      categories: chartData.map((data) => data.date),
+    },
+    colors: ["#3C50E0", "#10B981", "#E46060", "#FFC107"],
+  };
+
+  const chartSeries = eggTypes.map((type) => ({
+    name: type,
+    data: chartData.map((data) => data[type] || 0),
+  }));
+
   return (
-    <>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+    <DefaultLayout>
+      <Breadcrumb pageName="Daily Egg collection" />
+
+      <div className="grid grid-cols-1 justify-between gap-4 md:grid-cols-2 xl:grid-cols-4">
         <CardDataStats
           title="Total Eggs Collected"
           total={`${totalEggs}`}
@@ -143,55 +151,63 @@ const DailyEggCollection: React.FC = () => {
           <EggOff />
         </CardDataStats>
       </div>
+      <div className="rounded-sm border  border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark p-6 mt-4">
+        <div className="mt-4">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Add Today's Collection</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add Egg Collection</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+                {eggTypes.map((type) => (
+                  <div
+                    key={type}
+                    className="grid grid-cols-4 items-center gap-4"
+                  >
+                    <Label htmlFor={type} className="text-right">
+                      {type}
+                    </Label>
+                    <Input
+                      id={type}
+                      name={type}
+                      type="number"
+                      defaultValue={collectionData[type] || "0"}
+                      className="col-span-3"
+                    />
+                  </div>
+                ))}
+                <Button type="submit">Save changes</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-      <div className="mt-4">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Add Today's Collection</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Add Egg Collection</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-              {eggTypes.map((type) => (
-                <div key={type} className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor={type} className="text-right">
-                    {type}
-                  </Label>
-                  <Input
-                    id={type}
-                    name={type}
-                    type="number"
-                    defaultValue={collectionData[type] || "0"}
-                    className="col-span-3"
-                  />
-                </div>
-              ))}
-              <Button type="submit">Save changes</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <div className="mt-4">
+          <Suspense fallback={<div>Loading Chart...</div>}>
+            <ApexChart
+              options={chartOptions}
+              series={chartSeries}
+              type="bar"
+              height={400}
+            />
+          </Suspense>
+        </div>
+        <ToastContainer
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
-
-      <div className="mt-4">
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={chartData}>
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            {eggTypes.map((type, index) => (
-              <Bar
-                key={type}
-                dataKey={type}
-                fill={`hsl(${index * 60}, 70%, 50%)`}
-              />
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </>
+    </DefaultLayout>
   );
 };
 
