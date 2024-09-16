@@ -104,7 +104,6 @@ const ChartTwo: React.FC = () => {
 
     fetchData();
   }, []);
-  const totalRevenuerounded = Math.round(financialData.totalRevenue).toFixed(2);
   const series = [
     {
       name: "Financial Data",
@@ -151,7 +150,9 @@ const ChartTwo: React.FC = () => {
           <li>Capital: ₹{financialData.capital}</li>
           <li>Net Profit: ₹{financialData.netProfit}</li>
           <li>Total Inventory Cost: ₹{financialData.totalInventoryCost}</li>
-          <li>Total Revenue: ₹{totalRevenuerounded}</li>
+          <li>
+            Total Revenue: ₹{Math.round(financialData.totalRevenue).toFixed(2)}
+          </li>
         </ul>
       </div>
     </div>

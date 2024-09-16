@@ -1,19 +1,33 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+admin.initializeApp();
 
-import {onRequest} from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger";
+exports.addDailyEggCollection = functions.pubsub
+  .schedule("59 23 * * *")
+  .onRun(async () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayString = today.toISOString().split("T")[0];
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+    const docRef = admin
+      .firestore()
+      .collection("egg-collections")
+      .doc(todayString);
+    const doc = await docRef.get();
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+    if (!doc.exists) {
+      await docRef.set({
+        date: admin.firestore.Timestamp.fromDate(today),
+        collection: {
+          "Standard White Eggs": 100,
+          "Standard Brown Eggs": 100,
+          "Furnished / Enriched / Nest-Laid Eggs": 75,
+          "Vitamin-Enhanced Eggs": 75,
+          "Vegetarian Eggs": 75,
+          "Processed Eggs": 75,
+        },
+      });
+    }
+
+    return null;
+  });

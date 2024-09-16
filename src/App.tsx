@@ -6,6 +6,8 @@ import ManageInventoryPage from "./pages/Inventory/ManageInventory";
 import AddProductPage from "./pages/Product/AddProduct";
 import OrdersPage from "./pages/Orders/OrdersPage";
 import ManageProductPage from "./pages/Product/ManageProduct";
+import Settings from "./pages/Settings/Settings";
+import Profile from "./pages/Profile/Profile";
 import ProductBuyingPage from "./pages/Products";
 import UserCartpage from "./pages/userCartPage";
 import LoginRegister from "./pages/LoginRegisterForm";
@@ -32,6 +34,8 @@ const ProtectedManageInventory = withAuth(ManageInventoryPage);
 const ProtectedAddProduct = withAuth(AddProductPage);
 const ProtectedOrderPage = withAuth(OrdersPage);
 const ProtectedManageProduct = withAuth(ManageProductPage);
+const ProtectedSettings = withAuth(Settings);
+const ProtectedProfile = withAuth(Profile);
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -46,7 +50,7 @@ const App: React.FC = () => {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
+
             <Route path="/breeding" element={<Breeding />} />
             <Route path="/franchise" element={<Franchise />} />
             <Route path="/bulk-orders" element={<BulkOrders />} />
@@ -55,6 +59,7 @@ const App: React.FC = () => {
             <Route path="/products" element={<ProductBuyingPage />} />
             <Route path="/cart" element={<UserCartpage />} />
             <Route path="/dashboard" element={<ProtectedDashboard />} />
+
             <Route index element={<Home />} />
             <Route
               path="/dashboard/add-inventory"
@@ -68,6 +73,8 @@ const App: React.FC = () => {
               path="/dashboard/add-product"
               element={<ProtectedAddProduct />}
             />
+            <Route path="/dashboard/settings" element={<ProtectedSettings />} />
+            <Route path="/dashboard/profile" element={<ProtectedProfile />} />
             <Route
               path="/dashboard/manage-product"
               element={<ProtectedManageProduct />}

@@ -16,6 +16,15 @@ import "react-toastify/dist/ReactToastify.css";
 import ProductModal from "../components/ProductModal";
 import { List, ShoppingCart } from "lucide-react";
 import ProductSkeleton from "../components/Skeleton/ProductSkeleton";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 
 interface ProductItem {
   id: string;

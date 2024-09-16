@@ -76,11 +76,11 @@ const menuGroups = [
         label: "Egg collections",
         route: "/dashboard/egg-collections",
       },
-      {
-        icon: <Merge size={18} />,
-        label: "Breed Management",
-        route: "/dashboard/breed-management",
-      },
+      // {
+      //   icon: <Merge size={18} />,
+      //   label: "Breed Management",
+      //   route: "/dashboard/breed-management",
+      // },
       {
         icon: <Activity size={18} />,
         label: "Health Monitoring",
