@@ -83,7 +83,7 @@ const ECommerce: React.FC = () => {
           <HandCoins />
         </CardDataStats>
         <CardDataStats
-          title="Total Product"
+          title="Total Inventory cost"
           total={formatCurrency(financialData.totalProduct)}
           rate={calculateRate(
             financialData.totalProduct,
