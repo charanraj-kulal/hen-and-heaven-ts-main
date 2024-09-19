@@ -1,5 +1,6 @@
 import React, { Suspense, useState, useEffect } from "react";
 import ChartOne from "../Charts/ChartOne";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import ChartTwo from "../Charts/ChartTwo";
 import { db } from "../../../firebase";
 import {
@@ -9,11 +10,46 @@ import {
   query,
   where,
   getDocs,
+  Timestamp,
 } from "firebase/firestore";
 import CardDataStats from "../CardDataStats";
 import { Eye, HandCoins, ShoppingBag, Users } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog";
+import { Button } from "../../components/ui/button";
 
 const ECommerce: React.FC = () => {
+  const [showReminderDialog, setShowReminderDialog] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (location.pathname.startsWith("/dashboard")) {
+      checkTodayCollection();
+    }
+  }, [location]);
+
+  const checkTodayCollection = async () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayDoc = await getDocs(
+      query(
+        collection(db, "egg-collections"),
+        where("date", "==", Timestamp.fromDate(today))
+      )
+    );
+    if (todayDoc.empty) {
+      setShowReminderDialog(true);
+    }
+  };
+
+  const handleAddNow = () => {
+    setShowReminderDialog(false);
+    navigate("/dashboard/egg-collections");
+  };
   const [financialData, setFinancialData] = useState({
     totalExpenses: 0,
     totalProfit: 0,
@@ -59,6 +95,7 @@ const ECommerce: React.FC = () => {
   };
   return (
     <>
+      <Outlet />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         <CardDataStats
           title="Total Expenses"
@@ -108,6 +145,23 @@ const ECommerce: React.FC = () => {
 
         <Suspense fallback={<div>Loading...</div>}></Suspense>
       </div>
+      <Dialog open={showReminderDialog} onOpenChange={setShowReminderDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Egg Collection Reminder</DialogTitle>
+          </DialogHeader>
+          <p>You haven't added today's egg collection yet.</p>
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowReminderDialog(false)}
+            >
+              I'll add later
+            </Button>
+            <Button onClick={handleAddNow}>Add now</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

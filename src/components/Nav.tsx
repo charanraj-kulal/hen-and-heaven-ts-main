@@ -127,16 +127,6 @@ function Navbar({ className }: { className?: string }) {
               />
             </div>
           </MenuItem>
-          <MenuItem setActive={setActive} active={active} item="Track Order">
-            <div className="flex flex-col space-y-4 text-sm">
-              <HoveredLink href="/track-your-order">
-                Track Your Order
-              </HoveredLink>
-              {/* <HoveredLink href="/individual">Individual</HoveredLink>
-              <HoveredLink href="/team">Team</HoveredLink>
-              <HoveredLink href="/enterprise">Enterprise</HoveredLink> */}
-            </div>
-          </MenuItem>
         </Menu>
 
         <div className="flex items-center space-x-4">

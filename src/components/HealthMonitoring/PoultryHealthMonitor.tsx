@@ -64,7 +64,6 @@ interface HealthCheck {
   id: string;
   date: Timestamp;
   checkType: string;
-  result: string;
 }
 
 interface BreedingRecord {
@@ -182,10 +181,7 @@ const PoultryHealthMonitor: React.FC = () => {
     );
   };
 
-  const addHealthCheck = async (data: {
-    checkType: string;
-    result: string;
-  }) => {
+  const addHealthCheck = async (data: { checkType: string }) => {
     try {
       await addDoc(collection(db, "health-checks"), {
         ...data,
@@ -306,15 +302,13 @@ const PoultryHealthMonitor: React.FC = () => {
                     addHealthCheck(
                       Object.fromEntries(formData) as {
                         checkType: string;
-                        result: string;
                       }
                     );
                   }}
                 >
                   <Label htmlFor="checkType">Check Type</Label>
                   <Input id="checkType" name="checkType" required />
-                  <Label htmlFor="result">Result</Label>
-                  <Input id="result" name="result" required />
+
                   <Button type="submit">Add</Button>
                 </form>
               </DialogContent>
@@ -324,7 +318,6 @@ const PoultryHealthMonitor: React.FC = () => {
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Check Type</TableHead>
-                  <TableHead>Result</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -334,7 +327,6 @@ const PoultryHealthMonitor: React.FC = () => {
                       {check.date.toDate().toLocaleDateString()}
                     </TableCell>
                     <TableCell>{check.checkType}</TableCell>
-                    <TableCell>{check.result}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
