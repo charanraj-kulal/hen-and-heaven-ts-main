@@ -21,6 +21,7 @@ import {
 import LottieLoader from "../LottieLoader";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 export const SignupForm: React.FC = () => {
   const { switchToSignin } = useContext(AccountContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,14 +32,31 @@ export const SignupForm: React.FC = () => {
     password: "",
     confirmPassword: "",
   });
+  const [errors, setErrors] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
   const HandleBack: any = async () => {
     navigate("/");
   };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    // Clear error when user starts typing
+    setErrors({
+      ...errors,
+      [e.target.name]: "",
+    });
+  };
+
+  const validateFullName = (name: string) => {
+    return name.trim().length >= 2; // At least 2 characters
   };
 
   const validateEmail = (email: string) => {
@@ -50,39 +68,60 @@ export const SignupForm: React.FC = () => {
     const passwordRegex = /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
     return passwordRegex.test(password);
   };
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    };
+
+    if (!formData.fullName) {
+      newErrors.fullName = "Full name is required";
+      isValid = false;
+    } else if (!validateFullName(formData.fullName)) {
+      newErrors.fullName = "Full name must be at least 2 characters long";
+      isValid = false;
+    }
+
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = "Please enter a valid email";
+      isValid = false;
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (!validatePassword(formData.password)) {
+      newErrors.password =
+        "Password must be at least 8 characters long and include one special character";
+      isValid = false;
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+      isValid = false;
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Check if all fields are filled
-    if (
-      !formData.fullName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.confirmPassword
-    ) {
-      toast.error("All fields are required.");
+    if (!validateForm()) {
       return;
     }
 
-    // Check email format
-    if (!validateEmail(formData.email)) {
-      toast.error("Please enter a valid email.");
-      return;
-    }
-
-    // Check password strength
-    if (!validatePassword(formData.password)) {
-      toast.error(
-        "Password must be at least 8 characters long and include one special character."
-      );
-      return;
-    }
-
-    // Check if passwords match
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match.");
-      return;
-    }
     setIsLoading(true);
     try {
       // Create user in Firebase Authentication
@@ -126,6 +165,11 @@ export const SignupForm: React.FC = () => {
             value={formData.fullName}
             onChange={handleChange}
           />
+          {errors.fullName && (
+            <span style={{ color: "red", fontSize: "0.8rem" }}>
+              {errors.fullName}
+            </span>
+          )}
           <Input
             type="email"
             name="email"
@@ -133,6 +177,11 @@ export const SignupForm: React.FC = () => {
             value={formData.email}
             onChange={handleChange}
           />
+          {errors.email && (
+            <span style={{ color: "red", fontSize: "0.8rem" }}>
+              {errors.email}
+            </span>
+          )}
           <Input
             type="password"
             name="password"
@@ -140,6 +189,11 @@ export const SignupForm: React.FC = () => {
             value={formData.password}
             onChange={handleChange}
           />
+          {errors.password && (
+            <span style={{ color: "red", fontSize: "0.8rem" }}>
+              {errors.password}
+            </span>
+          )}
           <Input
             type="password"
             name="confirmPassword"
@@ -147,9 +201,14 @@ export const SignupForm: React.FC = () => {
             value={formData.confirmPassword}
             onChange={handleChange}
           />
+          {errors.confirmPassword && (
+            <span style={{ color: "red", fontSize: "0.8rem" }}>
+              {errors.confirmPassword}
+            </span>
+          )}
           <Marginer direction="vertical" margin={10} />
           <SubmitButton type="submit" disabled={isLoading}>
-            {isLoading ? "Logging in..." : "Sign up"}
+            {isLoading ? "Signing up..." : "Sign up"}
           </SubmitButton>
         </FormContainer>
         <Marginer direction="vertical" margin="5px" />

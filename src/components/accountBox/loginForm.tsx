@@ -32,6 +32,10 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -44,6 +48,11 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    // Clear error when user starts typing
+    setErrors({
+      ...errors,
+      [e.target.name]: "",
+    });
   };
 
   const validateEmail = (email: string) => {
@@ -51,16 +60,38 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
     return emailRegex.test(email);
   };
 
+  const validatePassword = (password: string) => {
+    return password.length >= 6; // Assuming minimum password length is 6 characters
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { email: "", password: "" };
+
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = "Please enter a valid email";
+      isValid = false;
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (!validatePassword(formData.password)) {
+      newErrors.password = "Password must be at least 6 characters long";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password) {
-      toast.error("All fields are required.");
-      return;
-    }
-
-    if (!validateEmail(formData.email)) {
-      toast.error("Please enter a valid email.");
+    if (!validateForm()) {
       return;
     }
 
@@ -135,6 +166,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
             value={formData.email}
             onChange={handleChange}
           />
+          {errors.email && <span style={{ color: "red" }}>{errors.email}</span>}
           <Input
             type="password"
             name="password"
@@ -142,6 +174,9 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
             value={formData.password}
             onChange={handleChange}
           />
+          {errors.password && (
+            <span style={{ color: "red" }}>{errors.password}</span>
+          )}
           <Marginer direction="vertical" margin={10} />
           <MutedLink href="#">Forget your password?</MutedLink>
           <Marginer direction="vertical" margin="1.6em" />
