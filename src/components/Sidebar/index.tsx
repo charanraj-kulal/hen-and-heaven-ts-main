@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import SidebarItem from "../../components/Sidebar/SidebarItem";
 import ClickOutside from "../../components/ClickOutside";
 import useLocalStorage from "../../hooks/useLocalStorage";
@@ -12,7 +11,6 @@ import {
   Bolt,
   Activity,
   Egg,
-  Merge,
   User,
   Package,
   Home,
@@ -111,8 +109,6 @@ const menuGroups = [
 ];
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
-  const location = useLocation();
-  const pathname = location.pathname;
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
 
   return (

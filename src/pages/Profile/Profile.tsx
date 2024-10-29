@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase"; // Adjust this import based on your Firebase config file location
 import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";

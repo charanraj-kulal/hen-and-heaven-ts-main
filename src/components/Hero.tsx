@@ -10,8 +10,7 @@ const BLUR_FADE_DELAY = 0.1;
 const Hero = () => {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isVisible, setIsVisible] = useState(true);
-  const { theme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
   useEffect(() => {
     // Ensure dark mode is set on initial load
     setTheme("dark");
@@ -25,15 +24,15 @@ const Hero = () => {
   };
 
   // Detect when the hero section is in view
+  // Detect when the hero section is out of view and mute the video
   useEffect(() => {
     const handleScroll = () => {
       const heroSection = document.getElementById("hero");
       const rect = heroSection?.getBoundingClientRect();
-      const isInView =
-        rect && rect.top >= 0 && rect.bottom <= window.innerHeight;
-      setIsVisible(!!isInView);
+      const isOutOfView =
+        rect && (rect.top < 0 || rect.bottom > window.innerHeight);
 
-      if (videoRef.current && !isInView) {
+      if (videoRef.current && isOutOfView) {
         videoRef.current.muted = true;
         setIsMuted(true);
       }
@@ -45,7 +44,6 @@ const Hero = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
   return (
     <section id="hero" className="relative h-screen text-white">
       {/* Background Video */}

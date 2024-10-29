@@ -1,7 +1,7 @@
 "use client";
 
 import { ApexOptions } from "apexcharts";
-import React, { lazy, Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
 import { doc, getDoc } from "firebase/firestore";

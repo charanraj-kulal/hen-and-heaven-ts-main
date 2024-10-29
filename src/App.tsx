@@ -48,6 +48,10 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <ThemeProvider attribute="class" defaultTheme="dark">
       <UserProvider>

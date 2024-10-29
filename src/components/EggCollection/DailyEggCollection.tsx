@@ -39,7 +39,7 @@ const eggTypes = [
 
 const DailyEggCollection: React.FC = () => {
   const [totalEggs, setTotalEggs] = useState(0);
-  const [eggsSold, setEggsSold] = useState(0);
+  const [eggsSold] = useState(0);
   const [collectionData, setCollectionData] = useState<{
     [key: string]: number;
   }>({});

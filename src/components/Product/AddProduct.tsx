@@ -7,7 +7,6 @@ import { useUser } from "../../hooks/UserContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { storage, db } from "../../../firebase";
-import { useNavigate } from "react-router-dom";
 
 const ProductAddForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -27,7 +26,6 @@ const ProductAddForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [discounted, setDiscounted] = useState(false);
   const { userData } = useUser();
-  const navigate = useNavigate();
 
   const subTypeOptions: { [key: string]: string[] } = {
     eggs: [

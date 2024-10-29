@@ -1,11 +1,9 @@
-import React from "react";
 import { useTheme } from "next-themes";
 import { Sun, Moon, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useUser } from "../hooks/UserContext";
+
 const ModeToggle = () => {
   const { theme, setTheme } = useTheme();
-  const { userData } = useUser();
 
   return (
     <button

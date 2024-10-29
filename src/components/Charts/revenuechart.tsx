@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
 
@@ -8,7 +8,7 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
 });
 
 const RevenueNetProfitChart: React.FC = () => {
-  const [chartData, setChartData] = useState({
+  const [chartData] = useState({
     categories: ["Week 1", "Week 2", "Week 3", "Week 4"],
     revenue: [99660.8, 99660.8, 99660.8, 99660.8],
     netProfit: [3400, 3400, 3400, 3400],

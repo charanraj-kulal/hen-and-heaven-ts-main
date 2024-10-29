@@ -14,7 +14,6 @@ import { useUser } from "../../hooks/UserContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { storage, db } from "../../../firebase";
-import { useNavigate } from "react-router-dom";
 
 const InventoryAdd: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -28,7 +27,6 @@ const InventoryAdd: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [availableImages, setAvailableImages] = useState<string[]>([]);
   const { userData } = useUser();
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAvailableImages();
@@ -71,13 +69,8 @@ const InventoryAdd: React.FC = () => {
       const henAndHeavenDoc = doc(db, "hen-and-heaven", "gNfmJEedFjmg8g6I7vMO");
       const docSnap = await getDoc(henAndHeavenDoc);
       if (docSnap.exists()) {
-        const {
-          capital,
-          expense,
-          netProfit,
-          totalInventoryCost,
-          totalRevenue,
-        } = docSnap.data();
+        const { expense, netProfit, totalInventoryCost, totalRevenue } =
+          docSnap.data();
 
         const cost = parseFloat(formData.cost);
         const quantity = parseInt(formData.quantity);

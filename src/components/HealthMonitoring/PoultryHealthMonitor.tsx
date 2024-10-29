@@ -25,7 +25,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "../../components/ui/dialog";
 import {
   Table,
@@ -35,12 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
+
 import {
   LineChart,
   Line,

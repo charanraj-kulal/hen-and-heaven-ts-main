@@ -7,7 +7,7 @@ import {
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
-import { Pencil, Trash, Save, Plus } from "lucide-react";
+import { Pencil, Trash, Save } from "lucide-react";
 import { db } from "../../../firebase";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
